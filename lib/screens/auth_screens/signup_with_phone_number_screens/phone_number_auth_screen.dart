@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/util_screens/country_codes_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class PhoneNumberAuth extends StatefulWidget {
   static const route = '/signup-with-phone-number-auth-screen';
@@ -125,36 +124,10 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                           width: 20,
                         ),
                         Expanded(
-                          // child: CustomTextField(
-                          //   obscureText: false,
-                          //   textInputAction: TextInputAction.done,
-                          //   textInputType: TextInputType.phone,
-                          //   onChanged: (phoneValue) {
-                          //     if (phoneValue.isNotEmpty &&
-                          //         RegExp(r'^[0-9]').hasMatch(phoneValue)) {
-                          //       isPhoneNumberEntered = true;
-                          //       setState(() {});
-                          //       return;
-                          //     }
-                          //     isPhoneNumberEntered = false;
-                          //     setState(() {});
-                          //   },
-                          //   inputDecoration: InputDecoration(
-                          //     border: InputBorder.none,
-                          //     hintText: "Phone number",
-                          //     hintStyle: TextStyle(
-                          //       color: Theme.of(context)
-                          //           .textTheme
-                          //           .bodyText2!
-                          //           .color,
-                          //       fontSize: 15.0,
-                          //     ),
-                          //   ),
-                          // ),
                           child: TextFormField(
                             onChanged: (phoneValue) {
                               if (phoneValue.isNotEmpty &&
-                                  RegExp(r'^[0-9]').hasMatch(phoneValue)) {
+                                  !RegExp(r'[^0-9]$').hasMatch(phoneValue)) {
                                 isPhoneNumberEntered = true;
                                 setState(() {});
                                 return;
