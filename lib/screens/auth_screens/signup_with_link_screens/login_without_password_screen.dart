@@ -46,23 +46,6 @@ class _LoginWithoutPasswordState extends State<LoginWithoutPassword> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
-              // child: CustomTextField(
-              //   obscureText: false,
-              //   textInputAction: TextInputAction.done,
-              //   textInputType: TextInputType.emailAddress,
-              //   onChanged: (emailValue) {
-              //     if (emailValue.isNotEmpty) {
-              //       isUsernameOrEmailValid = true;
-              //       setState(() {});
-              //       return;
-              //     }
-              //     isUsernameOrEmailValid = false;
-              //     setState(() {});
-              //   },
-              //   inputDecoration: InputDecoration(
-              //     border: InputBorder.none,
-              //   ),
-              // ),
               child: TextFormField(
                 autofocus: true,
                 onChanged: (emailValue) {

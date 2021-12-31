@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/utils/date_picker.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_material_picker.dart';
@@ -23,7 +22,7 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
   int _currentYear = 0;
   int _dayOfMonthPicked = 0;
   int _monthPicked = 0;
-  int _initialYear = 1900;
+  final int _initialYear = 1900;
   int _yearPicked = 1900;
   FixedExtentScrollController? dayController;
   FixedExtentScrollController? monthController;

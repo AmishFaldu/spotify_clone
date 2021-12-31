@@ -45,23 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Colors.grey,
                 ),
-                // child: CustomTextField(
-                //   obscureText: false,
-                //   textInputAction: TextInputAction.next,
-                //   textInputType: TextInputType.emailAddress,
-                //   onChanged: (emailValue) {
-                //     if (emailValue.isNotEmpty) {
-                //       isUsernameOrEmailValid = true;
-                //       setState(() {});
-                //       return;
-                //     }
-                //     isUsernameOrEmailValid = false;
-                //     setState(() {});
-                //   },
-                //   inputDecoration: InputDecoration(
-                //     border: InputBorder.none,
-                //   ),
-                // ),
                 child: TextFormField(
                   onChanged: (emailValue) {
                     if (emailValue.isNotEmpty) {
@@ -101,23 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Colors.grey,
                 ),
-                // child: CustomTextField(
-                //   obscureText: true,
-                //   textInputAction: TextInputAction.done,
-                //   textInputType: TextInputType.text,
-                //   onChanged: (emailValue) {
-                //     if (emailValue.isNotEmpty) {
-                //       isPasswordValid = true;
-                //       setState(() {});
-                //       return;
-                //     }
-                //     isPasswordValid = false;
-                //     setState(() {});
-                //   },
-                //   inputDecoration: InputDecoration(
-                //     border: InputBorder.none,
-                //   ),
-                // ),
                 child: TextFormField(
                   obscureText: true,
                   onChanged: (emailValue) {

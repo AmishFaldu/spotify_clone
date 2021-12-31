@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/gesture_detector.dart';
 import 'package:spotify_clone/screens/util_screens/country_codes_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
@@ -43,7 +44,22 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
               ),
               child: Column(
                 children: [
-                  GestureDetector(
+                  GestureDetectorPhoneNumberWidget(
+                    child: Row(
+                      children: [
+                        Text(
+                          countryName,
+                          textAlign: TextAlign.center,
+                        ),
+                        Expanded(
+                          child: Text(''),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_right_outlined,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
                     onTap: () {
                       Navigator.of(context)
                           .pushNamed(CountryCode.route)
@@ -55,71 +71,30 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                         }
                       });
                     },
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 1,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            countryName,
-                            textAlign: TextAlign.center,
-                          ),
-                          Expanded(
-                            child: Text(''),
-                          ),
-                          Icon(
-                            Icons.keyboard_arrow_right_outlined,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                   SizedBox(
                     height: 50,
                     width: 400,
                     child: Row(
                       children: [
-                        GestureDetector(
-                          child: Container(
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  width: 1,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            padding: EdgeInsets.only(left: 15, right: 15),
+                        GestureDetectorPhoneNumberWidget(
                             child: Center(
                               child: Text(
                                 countryCode,
                                 textAlign: TextAlign.center,
                               ),
                             ),
-                          ),
-                          onTap: () {
-                            Navigator.of(context)
-                                .pushNamed(CountryCode.route)
-                                .then((value) {
-                              if (value != null) {
-                                countryName = (value as List<String>)[0];
-                                countryCode = (value)[1];
-                                setState(() {});
-                              }
-                            });
-                          },
-                        ),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pushNamed(CountryCode.route)
+                                  .then((value) {
+                                if (value != null) {
+                                  countryName = (value as List<String>)[0];
+                                  countryCode = (value)[1];
+                                  setState(() {});
+                                }
+                              });
+                            }),
                         SizedBox(
                           width: 20,
                         ),

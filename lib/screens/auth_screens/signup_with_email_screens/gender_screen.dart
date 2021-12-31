@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/confirm_create_account.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_button.dart';
 
 class SignupGenderScreen extends StatelessWidget {
   static const route = '/signup-gender-screen';
@@ -33,102 +33,30 @@ class SignupGenderScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                CustomBouncingButton(
-                  child: TextButton(
+                CustomTextButton(
+                    text: 'Female',
                     onPressed: () {
                       Navigator.of(context)
                           .pushNamed(SignupConfirmCreateAccount.route);
-                    },
-                    child: Text(
-                      'Female',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2!
-                          .copyWith(fontSize: 15),
-                    ),
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                      splashFactory: NoSplash.splashFactory,
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.grey, width: 2.5),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                    }),
                 SizedBox(
                   width: 20,
                 ),
-                CustomBouncingButton(
-                  child: TextButton(
+                CustomTextButton(
+                    text: 'Male',
                     onPressed: () {
                       Navigator.of(context)
                           .pushNamed(SignupConfirmCreateAccount.route);
-                    },
-                    child: Text(
-                      'Male',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2!
-                          .copyWith(fontSize: 15),
-                    ),
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                      splashFactory: NoSplash.splashFactory,
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.grey, width: 2),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                    }),
                 SizedBox(
                   width: 20,
                 ),
-                CustomBouncingButton(
-                  child: TextButton(
+                CustomTextButton(
+                    text: 'Non-binary',
                     onPressed: () {
                       Navigator.of(context)
                           .pushNamed(SignupConfirmCreateAccount.route);
-                    },
-                    child: Text(
-                      'Non-binary',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyText2!
-                          .copyWith(fontSize: 15),
-                    ),
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      ),
-                      splashFactory: NoSplash.splashFactory,
-                      backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          side: BorderSide(color: Colors.grey, width: 2.5),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                    }),
               ],
             ),
           ],

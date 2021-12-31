@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
-import 'package:spotify_clone/widgets/custom_widgets/date_picker.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_date_picker.dart';
 
 class SignupDateOfBirthScreen extends StatefulWidget {
   static const route = '/signup-date-of-birth-screen';
