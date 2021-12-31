@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/link_send_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class LoginWithoutPassword extends StatefulWidget {
   const LoginWithoutPassword({Key? key}) : super(key: key);
@@ -45,6 +46,23 @@ class _LoginWithoutPasswordState extends State<LoginWithoutPassword> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
+              // child: CustomTextField(
+              //   obscureText: false,
+              //   textInputAction: TextInputAction.done,
+              //   textInputType: TextInputType.emailAddress,
+              //   onChanged: (emailValue) {
+              //     if (emailValue.isNotEmpty) {
+              //       isUsernameOrEmailValid = true;
+              //       setState(() {});
+              //       return;
+              //     }
+              //     isUsernameOrEmailValid = false;
+              //     setState(() {});
+              //   },
+              //   inputDecoration: InputDecoration(
+              //     border: InputBorder.none,
+              //   ),
+              // ),
               child: TextFormField(
                 autofocus: true,
                 onChanged: (emailValue) {

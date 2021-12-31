@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:spotify_clone/screens/auth_screens/auth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/signup_date_of_birth_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/signup_email_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/signup_password_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/confirm_create_account.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/email_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/link_send_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/phone_number_auth_screen.dart';
@@ -58,6 +60,11 @@ class MyApp extends StatelessWidget {
         ),
         primaryIconTheme: const IconThemeData(
           color: Colors.white,
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            splashFactory: NoSplash.splashFactory,
+          ),
         ),
         buttonTheme: ButtonThemeData(
           colorScheme: ColorScheme(
@@ -183,12 +190,15 @@ class MyApp extends StatelessWidget {
         HomeScreen.route: (ctx) => const HomeScreen(),
         SignUpEmailScreen.route: (ctx) => const SignUpEmailScreen(),
         SignupPasswordScreen.route: (ctx) => const SignupPasswordScreen(),
+        SignupDateOfBirthScreen.route: (ctx) => const SignupDateOfBirthScreen(),
+        SignupGenderScreen.route: (ctx) => const SignupGenderScreen(),
+        SignupConfirmCreateAccount.route: (ctx) =>
+            const SignupConfirmCreateAccount(),
         LoginScreen.route: (ctx) => const LoginScreen(),
         LoginWithoutPassword.route: (ctx) => const LoginWithoutPassword(),
         LinkSendScreen.route: (ctx) => const LinkSendScreen(),
         PhoneNumberAuth.route: (ctx) => const PhoneNumberAuth(),
         CountryCode.route: (ctx) => const CountryCode(),
-        SignupDateOfBirthScreen.route: (ctx) => const SignupDateOfBirthScreen(),
       },
       // initialRoute: '/splashScreen',
     );

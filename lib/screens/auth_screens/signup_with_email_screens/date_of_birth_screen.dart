@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/date_picker.dart';
 
@@ -35,10 +36,6 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
         keyboardOverlayHeight -
         appBarHeight -
         20;
-    print(containerHeight);
-    print(topOverlayHeight);
-    print(bottomOverlayHeight);
-    print(keyboardOverlayHeight);
 
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -80,7 +77,9 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
                             .copyWith(letterSpacing: .2, color: Colors.black),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(SignupGenderScreen.route);
+                    },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
                           Theme.of(context).buttonTheme.colorScheme?.primary),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/utils/country_code_map.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class CountryCode extends StatefulWidget {
   static const route = '/signup-with-phone-number-country-code-screen';
@@ -13,7 +14,8 @@ class CountryCode extends StatefulWidget {
 class _CountryCodeState extends State<CountryCode> {
   List<List<String>> filteredCountryCodes = countryCodes;
   bool hasFilterValue = false;
-  final textEditingController = TextEditingController();
+  final textEditingController = TextEditingController(text: '');
+  bool isInputEntered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +23,7 @@ class _CountryCodeState extends State<CountryCode> {
       title: const Text('Choose your country'),
     );
 
+    final deviceWidth = MediaQuery.of(context).size.width;
     final topOverlay = MediaQuery.of(context).padding.top;
     final appBarHeight = appBar.preferredSize.height;
     final keyboardOverlayHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -36,62 +39,128 @@ class _CountryCodeState extends State<CountryCode> {
         children: [
           Container(
             height: 50,
+            width: deviceWidth,
             margin: EdgeInsets.symmetric(horizontal: 10),
             padding: EdgeInsets.symmetric(horizontal: 10),
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(5)),
               color: Colors.grey,
             ),
-            child: TextFormField(
-              controller: textEditingController,
-              onChanged: (filterValue) {
-                if (filterValue.isNotEmpty) {
-                  filteredCountryCodes = countryCodes.where((countryCode) {
-                    return countryCode[0]
-                        .toLowerCase()
-                        .contains(filterValue.toLowerCase());
-                  }).toList();
-                  hasFilterValue = true;
-                  setState(() {});
-                  return;
-                }
-                hasFilterValue = false;
-                filteredCountryCodes = countryCodes;
-                setState(() {});
-              },
-              enableSuggestions: true,
-              autofocus: true,
-              textInputAction: TextInputAction.done,
-              keyboardType: TextInputType.text,
-              cursorColor: Colors.white,
-              decoration: InputDecoration(
-                prefixIcon: Icon(
+            child: Row(
+              children: [
+                Icon(
                   Icons.search,
                   color: Theme.of(context).primaryIconTheme.color,
                 ),
-                suffixIcon: hasFilterValue
-                    ? IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        icon: Icon(
-                          Icons.clear,
-                          color: Theme.of(context).primaryIconTheme.color,
-                        ),
-                        onPressed: () {
-                          textEditingController.clear();
-                          filteredCountryCodes = countryCodes;
-                          hasFilterValue = false;
-                          setState(() {});
-                        },
-                      )
-                    : null,
-                border: InputBorder.none,
-                hintText: "Search",
-                hintStyle: TextStyle(
-                  color: Theme.of(context).textTheme.bodyText2!.color,
+                SizedBox(
+                  width: 20,
                 ),
-              ),
+                Expanded(
+                  child: TextField(
+                    obscureText: false,
+                    textInputAction: TextInputAction.done,
+                    keyboardType: TextInputType.text,
+                    controller: textEditingController,
+                    onChanged: (filterValue) {
+                      if (filterValue.isNotEmpty) {
+                        filteredCountryCodes =
+                            countryCodes.where((countryCode) {
+                          return countryCode[0]
+                              .toLowerCase()
+                              .contains(filterValue.toLowerCase());
+                        }).toList();
+                        hasFilterValue = true;
+                        setState(() {});
+                        return;
+                      }
+                      hasFilterValue = false;
+                      filteredCountryCodes = countryCodes;
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Search",
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).textTheme.bodyText2!.color,
+                        fontSize: 15.0,
+                      ),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+                if (hasFilterValue)
+                  IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).primaryIconTheme.color,
+                    ),
+                    onPressed: () {
+                      textEditingController.clear();
+                      filteredCountryCodes = countryCodes;
+                      hasFilterValue = false;
+                      setState(() {});
+                    },
+                  )
+              ],
             ),
+            // child: TextFormField(
+            //   controller: textEditingController,
+            //   onChanged: (filterValue) {
+            //     if (filterValue.isNotEmpty) {
+            //       filteredCountryCodes = countryCodes.where((countryCode) {
+            //         return countryCode[0]
+            //             .toLowerCase()
+            //             .contains(filterValue.toLowerCase());
+            //       }).toList();
+            //       hasFilterValue = true;
+            //       setState(() {});
+            //       return;
+            //     }
+            //     hasFilterValue = false;
+            //     filteredCountryCodes = countryCodes;
+            //     setState(() {});
+            //   },
+            //   enableSuggestions: true,
+            //   autofocus: true,
+            //   textInputAction: TextInputAction.done,
+            //   keyboardType: TextInputType.text,
+            //   cursorColor: Colors.white,
+            //   decoration: InputDecoration(
+            //     prefixIcon: Icon(
+            //       Icons.search,
+            //       color: Theme.of(context).primaryIconTheme.color,
+            //     ),
+            //     suffixIcon: hasFilterValue
+            //         ? IconButton(
+            //             splashColor: Colors.transparent,
+            //             highlightColor: Colors.transparent,
+            //             icon: Icon(
+            //               Icons.clear,
+            //               color: Theme.of(context).primaryIconTheme.color,
+            //             ),
+            //             onPressed: () {
+            //               textEditingController.clear();
+            //               filteredCountryCodes = countryCodes;
+            //               hasFilterValue = false;
+            //               setState(() {});
+            //             },
+            //           )
+            //         : null,
+            //     border: InputBorder.none,
+            //     hintText: "Search",
+            //     hintStyle: TextStyle(
+            //       color: Theme.of(context).textTheme.bodyText2!.color,
+            //     ),
+            //   ),
+            //   cursorHeight: 21,
+            //   cursorRadius: Radius.circular(
+            //     10,
+            //   ),
+            //   style: TextStyle(
+            //     fontSize: 16,
+            //   ),
+            // ),
           ),
           SizedBox(
             height: containerHeight,

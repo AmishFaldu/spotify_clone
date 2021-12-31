@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/signup_password_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class SignUpEmailScreen extends StatefulWidget {
   const SignUpEmailScreen({Key? key}) : super(key: key);
@@ -56,6 +57,23 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
+              // child: CustomTextField(
+              //   obscureText: false,
+              //   textInputAction: TextInputAction.done,
+              //   textInputType: TextInputType.emailAddress,
+              //   onChanged: (emailValue) {
+              //     if (emailValue.isNotEmpty && regex.hasMatch(emailValue)) {
+              //       isValidEmail = true;
+              //       setState(() {});
+              //       return;
+              //     }
+              //     isValidEmail = false;
+              //     setState(() {});
+              //   },
+              //   inputDecoration: InputDecoration(
+              //     border: InputBorder.none,
+              //   ),
+              // ),
               child: TextFormField(
                 onChanged: (emailValue) {
                   if (emailValue.isNotEmpty && regex.hasMatch(emailValue)) {

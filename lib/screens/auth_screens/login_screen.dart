@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -44,6 +45,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Colors.grey,
                 ),
+                // child: CustomTextField(
+                //   obscureText: false,
+                //   textInputAction: TextInputAction.next,
+                //   textInputType: TextInputType.emailAddress,
+                //   onChanged: (emailValue) {
+                //     if (emailValue.isNotEmpty) {
+                //       isUsernameOrEmailValid = true;
+                //       setState(() {});
+                //       return;
+                //     }
+                //     isUsernameOrEmailValid = false;
+                //     setState(() {});
+                //   },
+                //   inputDecoration: InputDecoration(
+                //     border: InputBorder.none,
+                //   ),
+                // ),
                 child: TextFormField(
                   onChanged: (emailValue) {
                     if (emailValue.isNotEmpty) {
@@ -83,6 +101,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Colors.grey,
                 ),
+                // child: CustomTextField(
+                //   obscureText: true,
+                //   textInputAction: TextInputAction.done,
+                //   textInputType: TextInputType.text,
+                //   onChanged: (emailValue) {
+                //     if (emailValue.isNotEmpty) {
+                //       isPasswordValid = true;
+                //       setState(() {});
+                //       return;
+                //     }
+                //     isPasswordValid = false;
+                //     setState(() {});
+                //   },
+                //   inputDecoration: InputDecoration(
+                //     border: InputBorder.none,
+                //   ),
+                // ),
                 child: TextFormField(
                   obscureText: true,
                   onChanged: (emailValue) {

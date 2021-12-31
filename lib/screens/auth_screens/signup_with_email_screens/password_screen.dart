@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/signup_date_of_birth_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class SignupPasswordScreen extends StatefulWidget {
   static const route = '/signup-login-screen';
@@ -52,6 +53,23 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
+              // child: CustomTextField(
+              //   obscureText: true,
+              //   textInputAction: TextInputAction.done,
+              //   textInputType: TextInputType.text,
+              //   onChanged: (passwordValue) {
+              //     if (passwordValue.isNotEmpty && passwordValue.length > 8) {
+              //       isValidPassword = true;
+              //       setState(() {});
+              //       return;
+              //     }
+              //     isValidPassword = false;
+              //     setState(() {});
+              //   },
+              //   inputDecoration: InputDecoration(
+              //     border: InputBorder.none,
+              //   ),
+              // ),
               child: TextFormField(
                 onFieldSubmitted: (passwordValue) {
                   if (passwordValue.isNotEmpty && passwordValue.length > 8) {
