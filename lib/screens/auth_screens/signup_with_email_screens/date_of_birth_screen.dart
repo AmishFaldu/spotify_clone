@@ -58,11 +58,11 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
                     ),
               ),
               const SizedBox(
-                height: 10,
+                height: 40,
               ),
               const CustomDatePickerWidget(),
               const SizedBox(
-                height: 30,
+                height: 40,
               ),
               Center(
                 child: CustomBouncingButton(

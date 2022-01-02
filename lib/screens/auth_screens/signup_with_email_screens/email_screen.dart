@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class SignUpEmailScreen extends StatefulWidget {
   const SignUpEmailScreen({Key? key}) : super(key: key);

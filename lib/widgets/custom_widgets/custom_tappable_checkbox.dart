@@ -5,7 +5,13 @@ class CustomTappableCheckBox extends StatelessWidget {
   final void Function(bool? value) onChanged;
   final String checkboxText;
   final bool checkBoxValue;
-  const CustomTappableCheckBox({Key? key, required this.checkboxText, required this.checkBoxValue, required this.onTap, required this.onChanged}) : super(key: key);
+  const CustomTappableCheckBox(
+      {Key? key,
+      required this.checkboxText,
+      required this.checkBoxValue,
+      required this.onTap,
+      required this.onChanged})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +19,7 @@ class CustomTappableCheckBox extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 300,
             child: Text(
               checkboxText,

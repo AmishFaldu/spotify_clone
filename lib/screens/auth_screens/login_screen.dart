@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

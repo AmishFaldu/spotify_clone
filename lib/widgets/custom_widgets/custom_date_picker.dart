@@ -98,7 +98,6 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
             _dayOfMonthPicked = index + 1;
             _datePicked =
                 DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
-            print("Date picked : $_datePicked");
             setState(() {});
           },
           listOfWidgets: listOfDayWidgets,
@@ -109,7 +108,6 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
             _monthPicked = index + 1;
             _datePicked =
                 DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
-            print("Date picked : $_datePicked");
             setState(() {});
           },
           listOfWidgets: listOfMonthWidgets,
@@ -120,7 +118,6 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
             _yearPicked = listOfYearsToShow[index];
             _datePicked =
                 DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
-            print("Date picked : $_datePicked");
             setState(() {});
           },
           listOfWidgets: listOfYearWidgets,

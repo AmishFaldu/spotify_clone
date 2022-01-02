@@ -11,10 +11,11 @@ import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gen
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/link_send_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/confirm_phone_number_code_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/phone_number_auth_screen.dart';
 import 'package:spotify_clone/screens/home_screen.dart';
 import 'package:spotify_clone/screens/splash_screen.dart';
-import 'package:spotify_clone/screens/util_screens/country_codes_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/country_codes_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_scroll.dart';
 
 void main() {
@@ -188,17 +189,24 @@ class MyApp extends StatelessWidget {
       routes: {
         SplashScreen.route: (ctx) => const SplashScreen(),
         HomeScreen.route: (ctx) => const HomeScreen(),
+
+        // auth_screens/signup_with_email_screens
         SignUpEmailScreen.route: (ctx) => const SignUpEmailScreen(),
         SignupPasswordScreen.route: (ctx) => const SignupPasswordScreen(),
         SignupDateOfBirthScreen.route: (ctx) => const SignupDateOfBirthScreen(),
         SignupGenderScreen.route: (ctx) => const SignupGenderScreen(),
         SignupConfirmCreateAccount.route: (ctx) =>
             const SignupConfirmCreateAccount(),
+
+        // auth_screens/signup_with_link_screens
         LoginScreen.route: (ctx) => const LoginScreen(),
         LoginWithoutPassword.route: (ctx) => const LoginWithoutPassword(),
         LinkSendScreen.route: (ctx) => const LinkSendScreen(),
+
+        // auth_screens/signup_with_phone_number_screens
         PhoneNumberAuth.route: (ctx) => const PhoneNumberAuth(),
-        CountryCode.route: (ctx) => const CountryCode(),
+        CountryCodeScreen.route: (ctx) => const CountryCodeScreen(),
+        ConfirmPhoneNumberCode.route: (ctx) => const ConfirmPhoneNumberCode(),
       },
       // initialRoute: '/splashScreen',
     );

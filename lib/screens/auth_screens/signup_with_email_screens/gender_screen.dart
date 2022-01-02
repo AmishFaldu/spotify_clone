@@ -19,7 +19,7 @@ class SignupGenderScreen extends StatelessWidget {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

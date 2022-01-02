@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/confirm_phone_number_code_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/gesture_detector.dart';
-import 'package:spotify_clone/screens/util_screens/country_codes_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/country_codes_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class PhoneNumberAuth extends StatefulWidget {
   static const route = '/signup-with-phone-number-auth-screen';
-
-  const PhoneNumberAuth({Key? key}) : super(key: key);
+  const PhoneNumberAuth({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _PhoneNumberAuthState createState() => _PhoneNumberAuthState();
@@ -16,6 +19,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
   bool isPhoneNumberEntered = false;
   String countryName = 'India';
   String countryCode = '+91';
+  String phoneNumber = "";
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,15 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
               child: Column(
                 children: [
                   GestureDetectorPhoneNumberWidget(
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          width: 1,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -62,7 +75,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     ),
                     onTap: () {
                       Navigator.of(context)
-                          .pushNamed(CountryCode.route)
+                          .pushNamed(CountryCodeScreen.route)
                           .then((value) {
                         if (value != null) {
                           countryName = (value as List<String>)[0];
@@ -78,6 +91,15 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     child: Row(
                       children: [
                         GestureDetectorPhoneNumberWidget(
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border(
+                                right: BorderSide(
+                                  width: 1,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                             child: Center(
                               child: Text(
                                 countryCode,
@@ -86,7 +108,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                             ),
                             onTap: () {
                               Navigator.of(context)
-                                  .pushNamed(CountryCode.route)
+                                  .pushNamed(CountryCodeScreen.route)
                                   .then((value) {
                                 if (value != null) {
                                   countryName = (value as List<String>)[0];
@@ -102,7 +124,8 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                           child: TextFormField(
                             onChanged: (phoneValue) {
                               if (phoneValue.isNotEmpty &&
-                                  !RegExp(r'[^0-9]$').hasMatch(phoneValue)) {
+                                  !RegExp(r'[^0-9]').hasMatch(phoneValue)) {
+                                phoneNumber = phoneValue;
                                 isPhoneNumberEntered = true;
                                 setState(() {});
                                 return;
@@ -114,7 +137,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                             initialValue: '',
                             autofocus: true,
                             textInputAction: TextInputAction.done,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                             cursorColor: Colors.white,
                             decoration: const InputDecoration(
                               border: InputBorder.none,
@@ -166,7 +189,16 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                           .copyWith(letterSpacing: .2, color: Colors.black),
                     ),
                   ),
-                  onPressed: isPhoneNumberEntered ? () {} : null,
+                  onPressed: isPhoneNumberEntered
+                      ? () {
+                          Navigator.of(context).pushNamed(
+                            ConfirmPhoneNumberCode.route,
+                            arguments: ConfirmPhoneNumberCodeArguments(
+                              phoneNumber: "$countryCode$phoneNumber",
+                            ),
+                          );
+                        }
+                      : null,
                   style: ButtonStyle(
                     backgroundColor: isPhoneNumberEntered
                         ? MaterialStateProperty.all(

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/utils/country_code_map.dart';
 
-class CountryCode extends StatefulWidget {
+class CountryCodeScreen extends StatefulWidget {
   static const route = '/signup-with-phone-number-country-code-screen';
 
-  const CountryCode({Key? key}) : super(key: key);
+  const CountryCodeScreen({Key? key}) : super(key: key);
 
   @override
-  State<CountryCode> createState() => _CountryCodeState();
+  State<CountryCodeScreen> createState() => _CountryCodeScreenState();
 }
 
-class _CountryCodeState extends State<CountryCode> {
+class _CountryCodeScreenState extends State<CountryCodeScreen> {
   List<List<String>> filteredCountryCodes = countryCodes;
   bool hasFilterValue = false;
   final textEditingController = TextEditingController(text: '');
