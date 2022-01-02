@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 
 class FocusableTextFormField extends StatelessWidget {
   final void Function(PointerDownEvent) onPointerDownFunction;
-  final Decoration? decoration;
+  final Decoration decoration;
   final TextEditingController textEditingController;
   final FocusNode textFormFieldFocusNode;
-  final void Function() setValueAndNavigateToNextFocusNode;
+  final void Function(String) onChanged;
+  final bool autofocus;
+  final TextInputAction textInputAction;
+  final void Function(String) onFieldSubmitted;
 
   const FocusableTextFormField({
     Key? key,
     required this.onPointerDownFunction,
-    this.decoration,
+    required this.decoration,
     required this.textEditingController,
-    required this.setValueAndNavigateToNextFocusNode,
     required this.textFormFieldFocusNode,
+    required this.onChanged,
+    required this.autofocus,
+    required this.onFieldSubmitted,
+    required this.textInputAction,
   }) : super(key: key);
 
   @override
@@ -30,19 +36,16 @@ class FocusableTextFormField extends StatelessWidget {
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 22),
-          autofocus: true,
+          autofocus: autofocus,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
           showCursor: false,
-          toolbarOptions: ToolbarOptions(),
+          toolbarOptions: const ToolbarOptions(),
           decoration: const InputDecoration(
             border: InputBorder.none,
             counterText: "",
           ),
-          textInputAction: TextInputAction.next,
-          onChanged: (value) {
-            if (value.isNotEmpty) {
-              setValueAndNavigateToNextFocusNode();
-            }
-          },
+          onChanged: onChanged,
         ),
       ),
     );

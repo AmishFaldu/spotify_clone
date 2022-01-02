@@ -80,6 +80,38 @@ bool checkForShowingNextButton({
   return showNextButton;
 }
 
+int navigateToAnotherFocusNode({
+  required int currentFocusNodeNumber,
+  required List<FocusNode> textFormFieldFocusNodes,
+  required BuildContext context,
+}) {
+  switch (currentFocusNodeNumber) {
+    case 1:
+      currentFocusNodeNumber = 2;
+      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[1]);
+      break;
+    case 2:
+      currentFocusNodeNumber = 3;
+      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[2]);
+      break;
+    case 3:
+      currentFocusNodeNumber = 4;
+      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[3]);
+      break;
+    case 4:
+      currentFocusNodeNumber = 5;
+      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[4]);
+      break;
+    case 5:
+      currentFocusNodeNumber = 6;
+      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[5]);
+      break;
+    default:
+      break;
+  }
+  return currentFocusNodeNumber;
+}
+
 List setValueAndNavigateToNextFocusNode({
   required int currentFocusNodeNumber,
   required List<TextEditingController> textEditingControllers,
@@ -90,28 +122,18 @@ List setValueAndNavigateToNextFocusNode({
   switch (currentFocusNodeNumber) {
     case 1:
       textEditingControllers[0].text = currentValue;
-      currentFocusNodeNumber = 2;
-      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[1]);
       break;
     case 2:
       textEditingControllers[1].text = currentValue;
-      currentFocusNodeNumber = 3;
-      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[2]);
       break;
     case 3:
       textEditingControllers[2].text = currentValue;
-      currentFocusNodeNumber = 4;
-      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[3]);
       break;
     case 4:
       textEditingControllers[3].text = currentValue;
-      currentFocusNodeNumber = 5;
-      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[4]);
       break;
     case 5:
       textEditingControllers[4].text = currentValue;
-      currentFocusNodeNumber = 6;
-      FocusScope.of(context).requestFocus(textFormFieldFocusNodes[5]);
       break;
     case 6:
       textEditingControllers[5].text = currentValue;
@@ -120,7 +142,11 @@ List setValueAndNavigateToNextFocusNode({
       break;
   }
   return [
-    currentFocusNodeNumber,
+    navigateToAnotherFocusNode(
+      currentFocusNodeNumber: currentFocusNodeNumber,
+      textFormFieldFocusNodes: textFormFieldFocusNodes,
+      context: context,
+    ),
     checkForShowingNextButton(textEditingControllers: textEditingControllers),
   ];
 }
@@ -194,4 +220,53 @@ List navigateToPreviousFocusNode({
     currentFocusNodeNumber,
     checkForShowingNextButton(textEditingControllers: textEditingControllers),
   ];
+}
+
+List rawKeyPressedEventFunction({
+  required RawKeyEvent event,
+  required int currentFocusNodeNumber,
+  required List<TextEditingController> textEditingControllers,
+  required List<FocusNode> textFormFieldFocusNodes,
+  required BuildContext context,
+}) {
+  bool showNextButton = false;
+  String currentValue = "";
+  if (isNumericKeyPressed(event: event) &&
+      event.runtimeType == RawKeyDownEvent) {
+    currentValue = event.character != null ? event.character as String : '';
+    if (currentFocusNodeNumber == 6) {
+      final result = setValueAndNavigateToNextFocusNode(
+        currentFocusNodeNumber: currentFocusNodeNumber,
+        textEditingControllers: textEditingControllers,
+        textFormFieldFocusNodes: textFormFieldFocusNodes,
+        currentValue: currentValue,
+        context: context,
+      );
+      currentFocusNodeNumber = result[0];
+      showNextButton = result[1];
+    }
+  } else if (event.isKeyPressed(LogicalKeyboardKey.backspace) &&
+      event.runtimeType == RawKeyDownEvent) {
+    final isCurrentFocusNodeHasValue =
+        showNextButton = checkIfCurrentFocusNodeHasValue(
+      currentFocusNodeNumber: currentFocusNodeNumber,
+      textEditingControllers: textEditingControllers,
+    );
+    if (isCurrentFocusNodeHasValue) {
+      showNextButton = clearCurrentFocusNodeValue(
+        currentFocusNodeNumber: currentFocusNodeNumber,
+        textEditingControllers: textEditingControllers,
+      );
+    } else {
+      final result = navigateToPreviousFocusNode(
+        currentFocusNodeNumber: currentFocusNodeNumber,
+        textEditingControllers: textEditingControllers,
+        textFormFieldFocusNodes: textFormFieldFocusNodes,
+        context: context,
+      );
+      currentFocusNodeNumber = result[0];
+      showNextButton = result[1];
+    }
+  }
+  return [currentValue, currentFocusNodeNumber, showNextButton];
 }

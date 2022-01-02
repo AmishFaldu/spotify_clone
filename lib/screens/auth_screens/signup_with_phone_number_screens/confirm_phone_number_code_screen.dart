@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/functions_for_confirm_code.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/focusable_text_form_field.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class ConfirmPhoneNumberCode extends StatefulWidget {
@@ -18,12 +19,12 @@ class ConfirmPhoneNumberCode extends StatefulWidget {
 
 class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
   bool isCodeEnteringCompleted = false;
-  FocusNode firstTextFormFieldFocusNode = new FocusNode();
-  FocusNode secondTextFormFieldFocusNode = new FocusNode();
-  FocusNode thirdTextFormFieldFocusNode = new FocusNode();
-  FocusNode fourthTextFormFieldFocusNode = new FocusNode();
-  FocusNode fifthTextFormFieldFocusNode = new FocusNode();
-  FocusNode sixthTextFormFieldFocusNode = new FocusNode();
+  FocusNode firstTextFormFieldFocusNode = FocusNode();
+  FocusNode secondTextFormFieldFocusNode = FocusNode();
+  FocusNode thirdTextFormFieldFocusNode = FocusNode();
+  FocusNode fourthTextFormFieldFocusNode = FocusNode();
+  FocusNode fifthTextFormFieldFocusNode = FocusNode();
+  FocusNode sixthTextFormFieldFocusNode = FocusNode();
 
   String currentValue = "";
   bool showNextButton = false;
@@ -35,6 +36,28 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
   final fourthTextEditingController = TextEditingController();
   final fifthTextEditingController = TextEditingController();
   final sixthTextEditingController = TextEditingController();
+
+  @override
+  void dispose() {
+    firstTextFormFieldFocusNode.dispose();
+    firstTextEditingController.dispose();
+
+    secondTextFormFieldFocusNode.dispose();
+    secondTextEditingController.dispose();
+
+    thirdTextFormFieldFocusNode.dispose();
+    thirdTextEditingController.dispose();
+
+    fourthTextFormFieldFocusNode.dispose();
+    fourthTextEditingController.dispose();
+
+    fifthTextFormFieldFocusNode.dispose();
+    fifthTextEditingController.dispose();
+
+    sixthTextFormFieldFocusNode.dispose();
+    sixthTextEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,363 +93,74 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: Text(
-                "Enter your code",
-                style: Theme.of(context).textTheme.headline5,
-              ),
+            Text(
+              "Enter your code",
+              style: Theme.of(context).textTheme.headline5,
             ),
             RawKeyboardListener(
               focusNode: FocusNode(),
               onKey: (event) {
-                print(event);
-                if (isNumericKeyPressed(event: event) &&
-                    event.runtimeType == RawKeyDownEvent) {
-                  currentValue =
-                      event.character != null ? event.character as String : '';
-                  if (currentFocusNodeNumber == 6) {
-                    final result = setValueAndNavigateToNextFocusNode(
-                      currentFocusNodeNumber: currentFocusNodeNumber,
-                      textEditingControllers: textEditingControllers,
-                      textFormFieldFocusNodes: textFormFieldFocusNodes,
-                      currentValue: currentValue,
-                      context: context,
-                    );
-                    currentFocusNodeNumber = result[0];
-                    showNextButton = result[1];
-                    setState(() {});
-                  }
-                } else if (event.isKeyPressed(LogicalKeyboardKey.backspace) &&
-                    event.runtimeType == RawKeyDownEvent) {
-                  final isCurrentFocusNodeHasValue =
-                      showNextButton = checkIfCurrentFocusNodeHasValue(
-                    currentFocusNodeNumber: currentFocusNodeNumber,
-                    textEditingControllers: textEditingControllers,
-                  );
-                  if (isCurrentFocusNodeHasValue) {
-                    showNextButton = clearCurrentFocusNodeValue(
-                      currentFocusNodeNumber: currentFocusNodeNumber,
-                      textEditingControllers: textEditingControllers,
-                    );
-                  } else {
-                    final result = navigateToPreviousFocusNode(
-                      currentFocusNodeNumber: currentFocusNodeNumber,
-                      textEditingControllers: textEditingControllers,
-                      textFormFieldFocusNodes: textFormFieldFocusNodes,
-                      context: context,
-                    );
-                    currentFocusNodeNumber = result[0];
-                    showNextButton = result[1];
-                  }
+                final result = rawKeyPressedEventFunction(
+                  event: event,
+                  currentFocusNodeNumber: currentFocusNodeNumber,
+                  textEditingControllers: textEditingControllers,
+                  textFormFieldFocusNodes: textFormFieldFocusNodes,
+                  context: context,
+                );
+                if (event.runtimeType == RawKeyDownEvent) {
+                  currentValue = result[0];
+                  currentFocusNodeNumber = result[1];
+                  showNextButton = result[2];
                   setState(() {});
                 }
               },
               child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 1;
+                  children: List<Widget>.generate(
+                    6,
+                    (i) => FocusableTextFormField(
+                      onPointerDownFunction: (event) {
+                        currentFocusNodeNumber = (i + 1);
                         setState(() {});
                         firstTextFormFieldFocusNode.requestFocus();
                       },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 1
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: firstTextEditingController,
-                          focusNode: firstTextFormFieldFocusNode,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          maxLength: 1,
-                          maxLengthEnforcement:
-                              MaxLengthEnforcement.truncateAfterCompositionEnds,
-                          autofocus: true,
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 2;
-                        setState(() {});
-                        secondTextFormFieldFocusNode.requestFocus();
-                      },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 2
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: secondTextEditingController,
-                          focusNode: secondTextFormFieldFocusNode,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          maxLength: 1,
-                          maxLengthEnforcement:
-                              MaxLengthEnforcement.truncateAfterCompositionEnds,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 3;
-                        setState(() {});
-                        thirdTextFormFieldFocusNode.requestFocus();
-                      },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 3
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: thirdTextEditingController,
-                          focusNode: thirdTextFormFieldFocusNode,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          maxLength: 1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 4;
-                        setState(() {});
-                        fourthTextFormFieldFocusNode.requestFocus();
-                      },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 4
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: fourthTextEditingController,
-                          focusNode: fourthTextFormFieldFocusNode,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          maxLength: 1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 5;
-                        setState(() {});
-                        fifthTextFormFieldFocusNode.requestFocus();
-                      },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 5
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: fifthTextEditingController,
-                          focusNode: fifthTextFormFieldFocusNode,
-                          keyboardType: TextInputType.number,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          maxLength: 1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                    Listener(
-                      onPointerDown: (event) {
-                        currentFocusNodeNumber = 6;
-                        sixthTextFormFieldFocusNode.requestFocus();
+                      textEditingController: textEditingControllers[i],
+                      textFormFieldFocusNode: textFormFieldFocusNodes[i],
+                      autofocus: i == 0,
+                      textInputAction:
+                          i == 5 ? TextInputAction.done : TextInputAction.next,
+                      onFieldSubmitted: (value) {
+                        currentFocusNodeNumber = navigateToAnotherFocusNode(
+                          currentFocusNodeNumber: currentFocusNodeNumber,
+                          textFormFieldFocusNodes: textFormFieldFocusNodes,
+                          context: context,
+                        );
                         setState(() {});
                       },
-                      child: Container(
-                        width: 35,
-                        decoration: BoxDecoration(
-                            color: currentFocusNodeNumber == 6
-                                ? Colors.grey[400]
-                                : Colors.grey[800],
-                            borderRadius: BorderRadius.circular(5)),
-                        child: TextFormField(
-                          enableInteractiveSelection: false,
-                          controller: sixthTextEditingController,
-                          focusNode: sixthTextFormFieldFocusNode,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(fontSize: 22),
-                          keyboardType: TextInputType.number,
-                          // maxLength: 1,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            counterText: "",
-                          ),
-                          showCursor: false,
-                          toolbarOptions: ToolbarOptions(),
-                          textInputAction: TextInputAction.next,
-                          onChanged: (value) {
-                            print("value is $value");
-                            if (value.isNotEmpty) {
-                              final result = setValueAndNavigateToNextFocusNode(
-                                currentFocusNodeNumber: currentFocusNodeNumber,
-                                textEditingControllers: textEditingControllers,
-                                textFormFieldFocusNodes:
-                                    textFormFieldFocusNodes,
-                                currentValue: currentValue,
-                                context: context,
-                              );
-                              currentFocusNodeNumber = result[0];
-                              showNextButton = result[1];
-                              setState(() {});
-                            }
-                          },
-                        ),
+                      decoration: BoxDecoration(
+                        color: currentFocusNodeNumber == (i + 1)
+                            ? Colors.grey[400]
+                            : Colors.grey[800],
+                        borderRadius: BorderRadius.circular(5),
                       ),
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          final result = setValueAndNavigateToNextFocusNode(
+                            currentFocusNodeNumber: currentFocusNodeNumber,
+                            textEditingControllers: textEditingControllers,
+                            textFormFieldFocusNodes: textFormFieldFocusNodes,
+                            currentValue: currentValue,
+                            context: context,
+                          );
+                          currentFocusNodeNumber = result[0];
+                          showNextButton = result[1];
+                          setState(() {});
+                        }
+                      },
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
