@@ -13,12 +13,12 @@ class CustomDatePickerWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomDatePickerWidgetState createState() => _CustomDatePickerWidgetState();
+  CustomDatePickerWidgetState createState() => CustomDatePickerWidgetState();
 }
 
-class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
+class CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
   bool isScrolling = false;
-  DateTime _datePicked = DateTime.now();
+  DateTime datePicked = DateTime.now();
   int _currentYear = 0;
   int _dayOfMonthPicked = 0;
   int _monthPicked = 0;
@@ -31,10 +31,10 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
 
   @override
   void initState() {
-    _currentYear = _datePicked.year;
-    _dayOfMonthPicked = _datePicked.day;
-    _monthPicked = _datePicked.month;
-    _yearPicked = _datePicked.year;
+    _currentYear = datePicked.year;
+    _dayOfMonthPicked = datePicked.day;
+    _monthPicked = datePicked.month;
+    _yearPicked = datePicked.year;
 
     listOfYearsToShow = [for (var i = _initialYear; i <= _currentYear; i++) i];
 
@@ -45,6 +45,14 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
     yearController =
         FixedExtentScrollController(initialItem: listOfYearsToShow.length - 1);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    dayController?.dispose();
+    monthController?.dispose();
+    yearController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -63,9 +71,12 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
     for (var i = 1; i <= noOfDaysInMonth; i++) {
       final textString = i < 10 ? '0$i' : '$i';
       listOfDayWidgets.add(
-        Text(
-          textString,
-          style: Theme.of(context).textTheme.bodyText2,
+        Center(
+          child: Text(
+            textString,
+            style: Theme.of(context).textTheme.bodyText2,
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }
@@ -73,19 +84,29 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
     /// Getting list of widgets for months in year to show in wheel scroll view
     for (var i = 0; i < monthNames.length; i++) {
       final textString = monthNames[i];
-      listOfMonthWidgets.add(Text(
-        textString,
-        style: Theme.of(context).textTheme.bodyText2,
-      ));
+      listOfMonthWidgets.add(
+        Center(
+          child: Text(
+            textString,
+            style: Theme.of(context).textTheme.bodyText2,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
 
     /// Getting list of widgets for years to show in wheel scroll view
     for (var i = _initialYear; i <= _currentYear; i++) {
       final textString = '$i';
-      listOfYearWidgets.add(Text(
-        textString,
-        style: Theme.of(context).textTheme.bodyText2,
-      ));
+      listOfYearWidgets.add(
+        Center(
+          child: Text(
+            textString,
+            style: Theme.of(context).textTheme.bodyText2,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
 
     return Row(
@@ -96,8 +117,7 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
           scrollController: dayController,
           onSelectedItemChanged: (index) {
             _dayOfMonthPicked = index + 1;
-            _datePicked =
-                DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
+            datePicked = DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
             setState(() {});
           },
           listOfWidgets: listOfDayWidgets,
@@ -106,8 +126,7 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
           scrollController: monthController,
           onSelectedItemChanged: (index) {
             _monthPicked = index + 1;
-            _datePicked =
-                DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
+            datePicked = DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
             setState(() {});
           },
           listOfWidgets: listOfMonthWidgets,
@@ -116,8 +135,7 @@ class _CustomDatePickerWidgetState extends State<CustomDatePickerWidget> {
           scrollController: yearController,
           onSelectedItemChanged: (index) {
             _yearPicked = listOfYearsToShow[index];
-            _datePicked =
-                DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
+            datePicked = DateTime(_yearPicked, _monthPicked, _dayOfMonthPicked);
             setState(() {});
           },
           listOfWidgets: listOfYearWidgets,

@@ -5,6 +5,7 @@ class CustomTappableCheckBox extends StatelessWidget {
   final void Function(bool? value) onChanged;
   final String checkboxText;
   final bool checkBoxValue;
+
   const CustomTappableCheckBox(
       {Key? key,
       required this.checkboxText,
@@ -19,8 +20,7 @@ class CustomTappableCheckBox extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          SizedBox(
-            width: 300,
+          Expanded(
             child: Text(
               checkboxText,
               softWrap: true,
@@ -30,7 +30,7 @@ class CustomTappableCheckBox extends StatelessWidget {
           Transform.scale(
             scale: 1.2,
             child: Checkbox(
-              side: BorderSide(
+              side: const BorderSide(
                 color: Colors.grey,
                 width: 1.5,
               ),

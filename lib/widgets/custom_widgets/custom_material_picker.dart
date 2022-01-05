@@ -22,10 +22,10 @@ class _CustomMaterialPickerState extends State<CustomMaterialPicker> {
     return Stack(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 65, left: 15),
-          padding: EdgeInsets.all(15),
-          child: Text("         "),
-          decoration: BoxDecoration(
+          margin: const EdgeInsets.only(top: 80, left: 15),
+          height: 60,
+          width: 60,
+          decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(
                 color: Colors.white,

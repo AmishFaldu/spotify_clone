@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
+import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignUpEmailScreen extends StatefulWidget {
@@ -12,11 +13,26 @@ class SignUpEmailScreen extends StatefulWidget {
 
 class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
   bool isValidEmail = false;
+  String email = '';
+  final GlobalKey<FormState> globalKeyForEmailFormField = GlobalKey();
   final regex = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-z0-9]+\.[a-z]+$",
     caseSensitive: false,
     multiLine: true,
   );
+
+  Future<void> saveEmailToSecureStorage() async {
+    SecureFlutterStorage storage = SecureFlutterStorage();
+    try {
+      final isDataValid = globalKeyForEmailFormField.currentState?.validate();
+      if (isDataValid != true) {
+        throw "Invalid email";
+      }
+      await storage.write(key: 'user.email', value: email);
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +73,20 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 color: Colors.grey,
               ),
               child: TextFormField(
+                key: globalKeyForEmailFormField,
+                validator: (emailValue) {
+                  if (email.isEmpty ||
+                      emailValue == null ||
+                      emailValue.trim().isEmpty) {
+                    return "Email cannot be empty";
+                  }
+
+                  if (!regex.hasMatch(emailValue)) {
+                    return "Invalid email address";
+                  }
+                },
                 onChanged: (emailValue) {
+                  email = emailValue;
                   if (emailValue.isNotEmpty && regex.hasMatch(emailValue)) {
                     isValidEmail = true;
                     setState(() {});
@@ -103,7 +132,8 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                     ),
                   ),
                   onPressed: isValidEmail
-                      ? () {
+                      ? () async {
+                          await saveEmailToSecureStorage();
                           Navigator.of(context)
                               .pushNamed(SignupPasswordScreen.route);
                         }

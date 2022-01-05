@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
+import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignupPasswordScreen extends StatefulWidget {
@@ -13,6 +14,21 @@ class SignupPasswordScreen extends StatefulWidget {
 
 class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
   bool isValidPassword = false;
+  GlobalKey<FormState> globalKeyForFormState = GlobalKey();
+  String password = '';
+
+  Future<void> savePasswordToSecureStorage() async {
+    SecureFlutterStorage storage = SecureFlutterStorage();
+    try {
+      final isDataValid = globalKeyForFormState.currentState?.validate();
+      if (password.isNotEmpty && isDataValid != true) {
+        throw "Invalid password";
+      }
+      await storage.write(key: 'user.password', value: password);
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +69,22 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                 color: Colors.grey,
               ),
               child: TextFormField(
-                onFieldSubmitted: (passwordValue) {
-                  if (passwordValue.isNotEmpty && passwordValue.length > 8) {
-                    isValidPassword = true;
-                    setState(() {});
-                    return;
+                key: globalKeyForFormState,
+                validator: (passwordValue) {
+                  if (password.trim().isEmpty ||
+                      passwordValue == null ||
+                      passwordValue.trim().isEmpty == true) {
+                    return "Password should not be empty";
                   }
-                  isValidPassword = false;
-                  setState(() {});
+
+                  if (passwordValue.trim().length > 8) {
+                    return "Password should be greater than 8 characters";
+                  }
                 },
                 onChanged: (passwordValue) {
-                  if (passwordValue.isNotEmpty && passwordValue.length > 8) {
+                  password = passwordValue;
+                  if (passwordValue.trim().isNotEmpty &&
+                      passwordValue.trim().length > 8) {
                     isValidPassword = true;
                     setState(() {});
                     return;
@@ -109,7 +130,8 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                     ),
                   ),
                   onPressed: isValidPassword
-                      ? () {
+                      ? () async {
+                          await savePasswordToSecureStorage();
                           Navigator.of(context)
                               .pushNamed(SignupDateOfBirthScreen.route);
                         }

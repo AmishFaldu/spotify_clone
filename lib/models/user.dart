@@ -8,18 +8,27 @@ class User {
   final String uid;
   final String userName;
   final String password;
+  final String dateOfBirth;
+  final String gender;
+  final String? email;
+  final String? phoneNumber;
+  final String? avatarUrl;
+
+  // privacy section
+  final bool isOptInForReceivingMarketingMessages;
+  final bool isOptInForSharingPersonalDataForMarketingPurposes;
+
+  // user's current subscription status
   final bool hasPremiumAccount;
   final String? premiumPlan;
+
+  // user's playlist and liked songs
   final List<Playlist> playlists;
   final List<Song> likedSongs;
 
   /// _id of the device
   final String? playingDevice;
   final List<String> connectedDevices;
-
-  final double volume;
-  final String email;
-  final String? avatarUrl;
 
   /// _id of the users
   final List<String> followers;
@@ -40,26 +49,30 @@ class User {
     required this.uid,
     required this.userName,
     required this.password,
+    required this.dateOfBirth,
+    required this.gender,
+    this.email,
+    this.phoneNumber,
+    this.avatarUrl,
+    required this.isOptInForReceivingMarketingMessages,
+    required this.isOptInForSharingPersonalDataForMarketingPurposes,
     required this.hasPremiumAccount,
     required this.premiumPlan,
     required this.playlists,
+    required this.recentlyPlayed,
     required this.likedSongs,
     required this.playingDevice,
     required this.connectedDevices,
-    required this.volume,
-    required this.email,
-    required this.avatarUrl,
     required this.followers,
     required this.following,
-    required this.recentlyPlayed,
     required this.isUserArtist,
+    this.artistPopularityCount,
     this.monthlyListeners,
     this.songs,
     this.positionInWorld,
     this.isVerified,
     this.photos,
     this.about,
-    this.artistPopularityCount,
   });
 }
 
@@ -79,69 +92,97 @@ class UserProvider extends ChangeNotifier {
         uid: userData['uid'],
         userName: userData['userName'],
         password: userData['password'],
+        dateOfBirth: userData['dateOfBirth'],
+        gender: userData['gender'],
+        email: userData['email'],
+        phoneNumber: userData['phoneNumber'],
+        avatarUrl: userData['avatarUrl'],
+        isOptInForReceivingMarketingMessages:
+            userData['isOptInForReceivingMarketingMessages'],
+        isOptInForSharingPersonalDataForMarketingPurposes:
+            userData['isOptInForSharingPersonalDataForMarketingPurposes'],
         hasPremiumAccount: userData['hasPremiumAccount'],
         premiumPlan: userData['premiumPlan'],
         playlists: userData['playlists'],
         likedSongs: userData['likedSongs'],
+        recentlyPlayed: userData['recentlyPlayed'],
         playingDevice: userData['playingDevice'],
         connectedDevices: userData['connectedDevices'],
-        volume: userData['volume'],
-        email: userData['email'],
-        avatarUrl: userData['avatarUrl'],
         followers: userData['followers'],
         following: userData['following'],
-        recentlyPlayed: userData['recentlyPlayed'],
         isUserArtist: userData['isUserArtist'],
+        artistPopularityCount: userData['artistPopularityCount'],
         monthlyListeners: userData['monthlyListeners'],
         songs: userData['songs'],
         positionInWorld: userData['positionInWorld'],
         isVerified: userData['isVerified'],
         photos: userData['photos'],
         about: userData['about'],
-        artistPopularityCount: userData['artistPopularityCount'],
       );
     }
   }
 
-  Future<void> signUpUser(
-      String userName, String email, String password) async {
+  Future<void> signUpUser({
+    required String userName,
+    String? email,
+    required String password,
+    required String gender,
+    required String dateOfBirth,
+    String? phoneNumber,
+    required isOptInForReceivingMarketingMessages,
+    required isOptInForSharingPersonalDataForMarketingPurposes,
+  }) async {
     final userAuthResponse = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
+
     final userData = {
       'uid': userAuthResponse.user?.uid,
       'userName': userName,
       'password': password,
+      'dateOfBirth': dateOfBirth,
+      'gender': gender,
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'avatarUrl': null,
+      'isOptInForReceivingMarketingMessages':
+          isOptInForReceivingMarketingMessages,
+      'isOptInForSharingPersonalDataForMarketingPurposes':
+          isOptInForSharingPersonalDataForMarketingPurposes,
       'hasPremiumAccount': false,
       'premiumPlan': null,
       'playlists': [],
       'likedSongs': [],
+      'recentlyPlayed': [],
       'playingDevice': null,
       'connectedDevices': [],
-      'volume': 70,
-      'email': email,
-      'avatarUrl': null,
       'followers': [],
       'following': [],
-      'recentlyPlayed': [],
       'isUserArtist': false,
     };
+
     await FirebaseFirestore.instance.collection('user').add(userData);
     _userDetails = User(
       uid: userAuthResponse.user!.uid,
       userName: userName,
       password: password,
+      dateOfBirth: dateOfBirth,
+      gender: gender,
+      email: email,
+      phoneNumber: phoneNumber,
+      avatarUrl: null,
+      isOptInForReceivingMarketingMessages:
+          isOptInForReceivingMarketingMessages,
+      isOptInForSharingPersonalDataForMarketingPurposes:
+          isOptInForSharingPersonalDataForMarketingPurposes,
       hasPremiumAccount: false,
       premiumPlan: null,
       playlists: [],
       likedSongs: [],
+      recentlyPlayed: [],
       playingDevice: null,
       connectedDevices: [],
-      volume: 70,
-      email: email,
-      avatarUrl: null,
       followers: [],
       following: [],
-      recentlyPlayed: [],
       isUserArtist: false,
     );
   }

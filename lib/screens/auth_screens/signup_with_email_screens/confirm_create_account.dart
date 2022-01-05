@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
+import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_tappable_checkbox.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SignupConfirmCreateAccount extends StatefulWidget {
   static const route = 'signup-confirm-create-account';
@@ -14,10 +18,55 @@ class SignupConfirmCreateAccount extends StatefulWidget {
 
 class _SignupConfirmCreateAccountState
     extends State<SignupConfirmCreateAccount> {
-  bool marketingCheckBox = false;
-  bool shareDataCheckBox = false;
+  bool receivingMarketingMessagesCheckBox = false;
+  bool sharingPersonalDataForMarketingPurposesCheckBox = false;
   bool isValidProfileName = false;
   bool isCreateButtonPressed = false;
+  String userName = '';
+  GlobalKey<FormState> formGlobalKey = GlobalKey();
+
+  void signupUser(BuildContext context) async {
+    SecureFlutterStorage storage = SecureFlutterStorage();
+    try {
+      final isFormDataValid = formGlobalKey.currentState?.validate();
+      if (userName.trim().isNotEmpty && isFormDataValid == true) {
+        final email = await storage.read(key: 'user.email');
+        final password = await storage.read(key: 'user.password') as String;
+        final gender = await storage.read(key: 'user.gender') as String;
+        final dateOfBirth =
+            await storage.read(key: 'user.dateOfBirth') as String;
+        final phoneNumber =
+            await storage.read(key: 'user.phoneNumber') as String;
+
+        await Provider.of<UserProvider>(context, listen: false).signUpUser(
+          userName: userName,
+          email: email,
+          password: password,
+          gender: gender,
+          dateOfBirth: dateOfBirth,
+          phoneNumber: phoneNumber,
+          isOptInForReceivingMarketingMessages:
+              !receivingMarketingMessagesCheckBox,
+          isOptInForSharingPersonalDataForMarketingPurposes:
+              sharingPersonalDataForMarketingPurposesCheckBox,
+        );
+      }
+    } catch (error) {
+      print(error);
+    }
+    await storage.deleteAll();
+  }
+
+  void launchUrl() async {
+    try {
+      final isUrlLaunched = await launch("https://www.google.com");
+      if (!isUrlLaunched) {
+        throw "Could not launch url";
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +95,7 @@ class _SignupConfirmCreateAccountState
       body: Stack(
         children: [
           Container(
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 10,
               right: 10,
               top: 10,
@@ -58,7 +107,7 @@ class _SignupConfirmCreateAccountState
                   Colors.transparent,
                   keyboardOverlayHeight > 0 ? Colors.black : Colors.transparent
                 ],
-                begin: Alignment.topCenter,
+                begin: Alignment.center,
                 end: Alignment.bottomCenter,
               ),
             ),
@@ -78,8 +127,15 @@ class _SignupConfirmCreateAccountState
                       color: Colors.grey,
                     ),
                     child: TextFormField(
+                      key: formGlobalKey,
+                      validator: (profileName) {
+                        if (profileName == null || profileName.trim().isEmpty) {
+                          return "Profile name should not be empty";
+                        }
+                      },
                       onChanged: (profileNameValue) {
-                        if (profileNameValue.isNotEmpty) {
+                        userName = profileNameValue;
+                        if (profileNameValue.trim().isNotEmpty) {
                           isValidProfileName = true;
                           setState(() {});
                           return;
@@ -97,17 +153,18 @@ class _SignupConfirmCreateAccountState
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Text("This appears on your Spotify Clone profile."),
-                  Divider(
+                  const Text("This appears on your Spotify Clone profile."),
+                  const Divider(
                     color: Colors.grey,
                     thickness: .6,
                     height: 40,
                   ),
-                  Text(
-                      "By tapping \"Create account\", you agree to the Spotify Clone Terms of Use."),
+                  const Text(
+                    "By tapping \"Create account\", you agree to the Spotify Clone Terms of Use.",
+                  ),
                   TextButton(
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.all(0),
@@ -117,10 +174,13 @@ class _SignupConfirmCreateAccountState
                       "Terms of Use",
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      launchUrl();
+                    },
                   ),
-                  Text(
-                      "To learn more about how Spotify Clone collects, uses, shares and protects your personal data, please see the Spotify Privacy Policy."),
+                  const Text(
+                    "To learn more about how Spotify Clone collects, uses, shares and protects your personal data, please see the Spotify Privacy Policy.",
+                  ),
                   TextButton(
                     style: ButtonStyle(
                       elevation: MaterialStateProperty.all(0),
@@ -130,35 +190,42 @@ class _SignupConfirmCreateAccountState
                       "Privacy Policy",
                       style: TextStyle(color: Theme.of(context).primaryColor),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      launchUrl();
+                    },
                   ),
                   CustomTappableCheckBox(
                       checkboxText:
                           "I would prefer not to receive marketing messages from Spotify Clone.",
-                      checkBoxValue: marketingCheckBox,
+                      checkBoxValue: receivingMarketingMessagesCheckBox,
                       onTap: () {
-                        marketingCheckBox = !marketingCheckBox;
+                        receivingMarketingMessagesCheckBox =
+                            !receivingMarketingMessagesCheckBox;
                         setState(() {});
                       },
                       onChanged: (value) {
-                        marketingCheckBox = !marketingCheckBox;
+                        receivingMarketingMessagesCheckBox =
+                            !receivingMarketingMessagesCheckBox;
                         setState(() {});
                       }),
                   CustomTappableCheckBox(
                       checkboxText:
                           "Share my registration data with Spotify Clone's content providers for marketing purposes.",
-                      checkBoxValue: shareDataCheckBox,
+                      checkBoxValue:
+                          sharingPersonalDataForMarketingPurposesCheckBox,
                       onTap: () {
-                        shareDataCheckBox = !shareDataCheckBox;
+                        sharingPersonalDataForMarketingPurposesCheckBox =
+                            !sharingPersonalDataForMarketingPurposesCheckBox;
                         setState(() {});
                       },
                       onChanged: (value) {
-                        shareDataCheckBox = !shareDataCheckBox;
+                        sharingPersonalDataForMarketingPurposesCheckBox =
+                            !sharingPersonalDataForMarketingPurposesCheckBox;
                         setState(() {});
                       }),
                   if (keyboardOverlayHeight > 0)
                     SizedBox(
-                      height: 100 + containerHeight * .1 * 2,
+                      height: 100 + containerHeight * .1,
                     ),
                 ],
               ),
@@ -182,6 +249,7 @@ class _SignupConfirmCreateAccountState
                                   setState(() {
                                     isCreateButtonPressed = true;
                                   });
+                                  signupUser(context);
                                 }
                               : null,
                           child: Text(
@@ -194,8 +262,10 @@ class _SignupConfirmCreateAccountState
                           ),
                           style: ButtonStyle(
                             padding: MaterialStateProperty.all(
-                              EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
+                              const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 15,
+                              ),
                             ),
                             splashFactory: NoSplash.splashFactory,
                             backgroundColor: isValidProfileName

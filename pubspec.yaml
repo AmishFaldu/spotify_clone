@@ -40,8 +40,10 @@ dependencies:
   cloud_firestore: 2.5.4
   firebase_auth: 3.1.4
   firebase_core: 1.8.0
-  open_mail_app: ^0.3.0
-  google_sign_in: ^5.2.1
+  open_mail_app: 0.3.0
+  google_sign_in: 5.2.1
+  url_launcher: 6.0.17
+  flutter_secure_storage: ^5.0.2
 
 flutter_icons:
   android: true

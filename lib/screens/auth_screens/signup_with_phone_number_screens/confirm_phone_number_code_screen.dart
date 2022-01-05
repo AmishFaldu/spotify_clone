@@ -4,6 +4,7 @@ import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/dat
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/functions_for_confirm_code.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/focusable_text_form_field.dart';
+import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class ConfirmPhoneNumberCode extends StatefulWidget {
@@ -36,6 +37,29 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
   final fourthTextEditingController = TextEditingController();
   final fifthTextEditingController = TextEditingController();
   final sixthTextEditingController = TextEditingController();
+
+  bool isValidCode(List<TextEditingController> textEditingControllers) {
+    final isDataValid = checkForShowingNextButton(
+        textEditingControllers: textEditingControllers);
+    if (isDataValid) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> savePhoneNumberToSecureStorage(String phoneNumber,
+      List<TextEditingController> textEditingControllers) async {
+    SecureFlutterStorage storage = SecureFlutterStorage();
+    try {
+      final isDataValid = isValidCode(textEditingControllers);
+      if (isDataValid != true) {
+        throw "Invalid code";
+      }
+      await storage.write(key: 'user.phoneNumber', value: phoneNumber);
+    } catch (error) {
+      print(error);
+    }
+  }
 
   @override
   void dispose() {
@@ -187,7 +211,9 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
                     ),
                   ),
                   onPressed: showNextButton
-                      ? () {
+                      ? () async {
+                          await savePhoneNumberToSecureStorage(
+                              phoneNumber, textEditingControllers);
                           Navigator.of(context).pushReplacementNamed(
                             SignupDateOfBirthScreen.route,
                           );

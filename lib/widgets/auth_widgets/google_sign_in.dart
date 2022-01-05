@@ -26,6 +26,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
   Future<void> googleSignIn() async {
     try {
       _currentUser = await _googleSignIn.signIn();
+      print(_currentUser);
     } catch (error) {
       print(error);
     }
@@ -41,7 +42,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
         child: Row(
           children: [
             Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 left: 8.0,
               ),
               child: Image.asset(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
+import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_date_picker.dart';
 
@@ -14,6 +15,23 @@ class SignupDateOfBirthScreen extends StatefulWidget {
 }
 
 class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
+  final GlobalKey<CustomDatePickerWidgetState> globalKeyForDatePicker =
+      GlobalKey();
+
+  Future<void> saveDOBToSecureStorage() async {
+    SecureFlutterStorage storage = SecureFlutterStorage();
+    try {
+      final dateOfBirthString =
+          globalKeyForDatePicker.currentState?.datePicked.toString();
+      if (dateOfBirthString == null) {
+        throw "Invalid date of birth";
+      }
+      await storage.write(key: 'user.dateOfBirth', value: dateOfBirthString);
+    } catch (error) {
+      print(error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -39,15 +57,15 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: appBar,
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          height: containerHeight,
-          margin: const EdgeInsets.only(
-            top: 20,
-            left: 14,
-            right: 14,
-          ),
+      body: Container(
+        width: double.infinity,
+        height: containerHeight,
+        margin: const EdgeInsets.only(
+          top: 20,
+          left: 14,
+          right: 14,
+        ),
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -76,7 +94,8 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
                             .copyWith(letterSpacing: .2, color: Colors.black),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      await saveDOBToSecureStorage();
                       Navigator.of(context).pushNamed(SignupGenderScreen.route);
                     },
                     style: ButtonStyle(
