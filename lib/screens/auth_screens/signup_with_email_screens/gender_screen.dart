@@ -8,10 +8,13 @@ class SignupGenderScreen extends StatelessWidget {
 
   const SignupGenderScreen({Key? key}) : super(key: key);
 
-  Future<void> saveGenderToSecureStorage(String gender) async {
+  Future<void> saveGenderToSecureStorageAndNavigateToNextScreen(
+      String gender, BuildContext context) async {
     SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       await storage.write(key: 'user.gender', value: gender);
+
+      Navigator.of(context).pushNamed(SignupConfirmCreateAccount.route);
     } catch (error) {
       print(error);
     }
@@ -46,9 +49,8 @@ class SignupGenderScreen extends StatelessWidget {
                 CustomTextButton(
                     text: 'Female',
                     onPressed: () async {
-                      await saveGenderToSecureStorage('female');
-                      Navigator.of(context)
-                          .pushNamed(SignupConfirmCreateAccount.route);
+                      await saveGenderToSecureStorageAndNavigateToNextScreen(
+                          'female', context);
                     }),
                 const SizedBox(
                   width: 20,
@@ -56,9 +58,8 @@ class SignupGenderScreen extends StatelessWidget {
                 CustomTextButton(
                     text: 'Male',
                     onPressed: () async {
-                      await saveGenderToSecureStorage('male');
-                      Navigator.of(context)
-                          .pushNamed(SignupConfirmCreateAccount.route);
+                      await saveGenderToSecureStorageAndNavigateToNextScreen(
+                          'male', context);
                     }),
                 const SizedBox(
                   width: 20,
@@ -66,9 +67,8 @@ class SignupGenderScreen extends StatelessWidget {
                 CustomTextButton(
                     text: 'Non-binary',
                     onPressed: () async {
-                      await saveGenderToSecureStorage('non-binary');
-                      Navigator.of(context)
-                          .pushNamed(SignupConfirmCreateAccount.route);
+                      await saveGenderToSecureStorageAndNavigateToNextScreen(
+                          'non-binary', context);
                     }),
               ],
             ),

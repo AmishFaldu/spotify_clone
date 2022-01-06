@@ -17,7 +17,7 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
   GlobalKey<FormState> globalKeyForFormState = GlobalKey();
   String password = '';
 
-  Future<void> savePasswordToSecureStorage() async {
+  Future<void> savePasswordToSecureStorageAndNavigateToNextScreen() async {
     SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final isDataValid = globalKeyForFormState.currentState?.validate();
@@ -25,6 +25,7 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
         throw "Invalid password";
       }
       await storage.write(key: 'user.password', value: password);
+      Navigator.of(context).pushNamed(SignupDateOfBirthScreen.route);
     } catch (error) {
       print(error);
     }
@@ -68,38 +69,41 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
-              child: TextFormField(
+              child: Form(
                 key: globalKeyForFormState,
-                validator: (passwordValue) {
-                  if (password.trim().isEmpty ||
-                      passwordValue == null ||
-                      passwordValue.trim().isEmpty == true) {
-                    return "Password should not be empty";
-                  }
+                child: TextFormField(
+                  validator: (passwordValue) {
+                    if (password.trim().isEmpty ||
+                        passwordValue == null ||
+                        passwordValue.trim().isEmpty == true) {
+                      return "Password should not be empty";
+                    }
 
-                  if (passwordValue.trim().length > 8) {
-                    return "Password should be greater than 8 characters";
-                  }
-                },
-                onChanged: (passwordValue) {
-                  password = passwordValue;
-                  if (passwordValue.trim().isNotEmpty &&
-                      passwordValue.trim().length > 8) {
-                    isValidPassword = true;
+                    print(passwordValue.trim().length);
+                    if (passwordValue.trim().length <= 8) {
+                      return "Password should be greater than 8 characters";
+                    }
+                  },
+                  onChanged: (passwordValue) {
+                    password = passwordValue;
+                    if (passwordValue.trim().isNotEmpty &&
+                        passwordValue.trim().length > 8) {
+                      isValidPassword = true;
+                      setState(() {});
+                      return;
+                    }
+                    isValidPassword = false;
                     setState(() {});
-                    return;
-                  }
-                  isValidPassword = false;
-                  setState(() {});
-                },
-                initialValue: '',
-                autofocus: true,
-                textInputAction: TextInputAction.done,
-                keyboardType: TextInputType.text,
-                obscureText: true,
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
+                  },
+                  initialValue: '',
+                  autofocus: true,
+                  textInputAction: TextInputAction.done,
+                  keyboardType: TextInputType.text,
+                  obscureText: true,
+                  cursorColor: Colors.white,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
             ),
@@ -131,9 +135,7 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                   ),
                   onPressed: isValidPassword
                       ? () async {
-                          await savePasswordToSecureStorage();
-                          Navigator.of(context)
-                              .pushNamed(SignupDateOfBirthScreen.route);
+                          await savePasswordToSecureStorageAndNavigateToNextScreen();
                         }
                       : null,
                   style: ButtonStyle(

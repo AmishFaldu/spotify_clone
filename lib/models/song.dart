@@ -4,7 +4,7 @@ import 'package:spotify_clone/models/user.dart';
 
 class Song {
   final String title;
-  final List<User> artists;
+  final List<SpotifyUser> artists;
   final List<Lyric> lyrics;
   final bool hasLyrics;
   final String avatar;

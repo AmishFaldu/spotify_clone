@@ -4,7 +4,7 @@ import 'package:spotify_clone/models/user.dart';
 
 class SpotifyGlobal extends ChangeNotifier {
   final List<Song> popularSongs;
-  final List<User> topArtists;
+  final List<SpotifyUser> topArtists;
 
   SpotifyGlobal(
     this.popularSongs,

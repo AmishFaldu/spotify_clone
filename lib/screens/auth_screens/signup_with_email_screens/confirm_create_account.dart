@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
+import 'package:spotify_clone/screens/home_screen.dart';
 import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_tappable_checkbox.dart';
@@ -30,31 +31,35 @@ class _SignupConfirmCreateAccountState
     try {
       final isFormDataValid = formGlobalKey.currentState?.validate();
       if (userName.trim().isNotEmpty && isFormDataValid == true) {
-        final email = await storage.read(key: 'user.email');
+        final email = await storage.read(key: 'user.email') as String;
         final password = await storage.read(key: 'user.password') as String;
         final gender = await storage.read(key: 'user.gender') as String;
         final dateOfBirth =
             await storage.read(key: 'user.dateOfBirth') as String;
-        final phoneNumber =
-            await storage.read(key: 'user.phoneNumber') as String;
+        // final phoneNumber =
+        //     await storage.read(key: 'user.phoneNumber') as String;
 
-        await Provider.of<UserProvider>(context, listen: false).signUpUser(
+        await Provider.of<SpotifyUserProvider>(context, listen: false)
+            .signUpUserWithEmail(
           userName: userName,
           email: email,
           password: password,
           gender: gender,
           dateOfBirth: dateOfBirth,
-          phoneNumber: phoneNumber,
           isOptInForReceivingMarketingMessages:
               !receivingMarketingMessagesCheckBox,
           isOptInForSharingPersonalDataForMarketingPurposes:
               sharingPersonalDataForMarketingPurposesCheckBox,
         );
+        await storage.deleteAll();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          HomeScreen.route,
+          (route) => false,
+        );
       }
     } catch (error) {
       print(error);
     }
-    await storage.deleteAll();
   }
 
   void launchUrl() async {
@@ -126,30 +131,33 @@ class _SignupConfirmCreateAccountState
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       color: Colors.grey,
                     ),
-                    child: TextFormField(
+                    child: Form(
                       key: formGlobalKey,
-                      validator: (profileName) {
-                        if (profileName == null || profileName.trim().isEmpty) {
-                          return "Profile name should not be empty";
-                        }
-                      },
-                      onChanged: (profileNameValue) {
-                        userName = profileNameValue;
-                        if (profileNameValue.trim().isNotEmpty) {
-                          isValidProfileName = true;
+                      child: TextFormField(
+                        validator: (profileName) {
+                          if (profileName == null ||
+                              profileName.trim().isEmpty) {
+                            return "Profile name should not be empty";
+                          }
+                        },
+                        onChanged: (profileNameValue) {
+                          userName = profileNameValue;
+                          if (profileNameValue.trim().isNotEmpty) {
+                            isValidProfileName = true;
+                            setState(() {});
+                            return;
+                          }
+                          isValidProfileName = false;
                           setState(() {});
-                          return;
-                        }
-                        isValidProfileName = false;
-                        setState(() {});
-                      },
-                      enableSuggestions: true,
-                      autofocus: true,
-                      textInputAction: TextInputAction.done,
-                      keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.white,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+                        },
+                        enableSuggestions: true,
+                        autofocus: true,
+                        textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.emailAddress,
+                        cursorColor: Colors.white,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ),

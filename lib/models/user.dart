@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:spotify_clone/models/playlist.dart';
 import 'package:spotify_clone/models/song.dart';
 
-class User {
+class SpotifyUser {
   final String uid;
   final String userName;
   final String password;
@@ -27,6 +27,7 @@ class User {
   final List<Song> likedSongs;
 
   /// _id of the device
+  final String deviceId;
   final String? playingDevice;
   final List<String> connectedDevices;
 
@@ -45,7 +46,7 @@ class User {
   final List<String>? photos;
   final String? about;
 
-  User({
+  SpotifyUser({
     required this.uid,
     required this.userName,
     required this.password,
@@ -61,6 +62,7 @@ class User {
     required this.playlists,
     required this.recentlyPlayed,
     required this.likedSongs,
+    required this.deviceId,
     required this.playingDevice,
     required this.connectedDevices,
     required this.followers,
@@ -76,8 +78,8 @@ class User {
   });
 }
 
-class UserProvider extends ChangeNotifier {
-  User? _userDetails;
+class SpotifyUserProvider extends ChangeNotifier {
+  SpotifyUser? _userDetails;
 
   Future<void> signInUser(String email, String password) async {
     final userAuthResponse = await FirebaseAuth.instance
@@ -88,7 +90,7 @@ class UserProvider extends ChangeNotifier {
         .get();
     final userData = response.data();
     if (userData != null) {
-      _userDetails = User(
+      _userDetails = SpotifyUser(
         uid: userData['uid'],
         userName: userData['userName'],
         password: userData['password'],
@@ -106,6 +108,7 @@ class UserProvider extends ChangeNotifier {
         playlists: userData['playlists'],
         likedSongs: userData['likedSongs'],
         recentlyPlayed: userData['recentlyPlayed'],
+        deviceId: "",
         playingDevice: userData['playingDevice'],
         connectedDevices: userData['connectedDevices'],
         followers: userData['followers'],
@@ -122,13 +125,12 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUpUser({
+  Future<void> signUpUserWithEmail({
     required String userName,
-    String? email,
+    required String email,
     required String password,
     required String gender,
     required String dateOfBirth,
-    String? phoneNumber,
     required isOptInForReceivingMarketingMessages,
     required isOptInForSharingPersonalDataForMarketingPurposes,
   }) async {
@@ -142,7 +144,7 @@ class UserProvider extends ChangeNotifier {
       'dateOfBirth': dateOfBirth,
       'gender': gender,
       'email': email,
-      'phoneNumber': phoneNumber,
+      'phoneNumber': null,
       'avatarUrl': null,
       'isOptInForReceivingMarketingMessages':
           isOptInForReceivingMarketingMessages,
@@ -153,6 +155,7 @@ class UserProvider extends ChangeNotifier {
       'playlists': [],
       'likedSongs': [],
       'recentlyPlayed': [],
+      'deviceId': '',
       'playingDevice': null,
       'connectedDevices': [],
       'followers': [],
@@ -161,14 +164,14 @@ class UserProvider extends ChangeNotifier {
     };
 
     await FirebaseFirestore.instance.collection('user').add(userData);
-    _userDetails = User(
+    _userDetails = SpotifyUser(
       uid: userAuthResponse.user!.uid,
       userName: userName,
       password: password,
       dateOfBirth: dateOfBirth,
       gender: gender,
       email: email,
-      phoneNumber: phoneNumber,
+      phoneNumber: null,
       avatarUrl: null,
       isOptInForReceivingMarketingMessages:
           isOptInForReceivingMarketingMessages,
@@ -179,6 +182,7 @@ class UserProvider extends ChangeNotifier {
       playlists: [],
       likedSongs: [],
       recentlyPlayed: [],
+      deviceId: '',
       playingDevice: null,
       connectedDevices: [],
       followers: [],
@@ -186,6 +190,86 @@ class UserProvider extends ChangeNotifier {
       isUserArtist: false,
     );
   }
+
+  // Future<void> signUpUserWithPhoneNumber({
+  //   required String userName,
+  //   required String phoneNumber,
+  //   required String gender,
+  //   required String dateOfBirth,
+  //   required isOptInForReceivingMarketingMessages,
+  //   required isOptInForSharingPersonalDataForMarketingPurposes,
+  // }) async {
+  //   final userAuthResponse = await FirebaseAuth.instance.verifyPhoneNumber(
+  //     phoneNumber: phoneNumber,
+  //     timeout: Duration(minutes: 5),
+  //     forceResendingToken: 2,
+  //     verificationFailed: (exception) {
+  //       print(exception);
+  //     },
+  //     codeAutoRetrievalTimeout: (verificationId) {
+  //       print("timeout for verification id $verificationId");
+  //     },
+  //     codeSent: (verificationId, forceResendingToken) {
+  //
+  //     },
+  //     verificationCompleted: (PhoneAuthCredential _creds) {
+  //       print(_creds);
+  //     },
+  //   );
+  //
+  //   final userData = {
+  //     'uid': userAuthResponse.user?.uid,
+  //     'userName': userName,
+  //     'password': password,
+  //     'dateOfBirth': dateOfBirth,
+  //     'gender': gender,
+  //     'email': email,
+  //     'phoneNumber': null,
+  //     'avatarUrl': null,
+  //     'isOptInForReceivingMarketingMessages':
+  //         isOptInForReceivingMarketingMessages,
+  //     'isOptInForSharingPersonalDataForMarketingPurposes':
+  //         isOptInForSharingPersonalDataForMarketingPurposes,
+  //     'hasPremiumAccount': false,
+  //     'premiumPlan': null,
+  //     'playlists': [],
+  //     'likedSongs': [],
+  //     'recentlyPlayed': [],
+  //     'deviceId': '',
+  //     'playingDevice': null,
+  //     'connectedDevices': [],
+  //     'followers': [],
+  //     'following': [],
+  //     'isUserArtist': false,
+  //   };
+  //
+  //   await FirebaseFirestore.instance.collection('user').add(userData);
+  //   _userDetails = User(
+  //     uid: userAuthResponse.user!.uid,
+  //     userName: userName,
+  //     password: password,
+  //     dateOfBirth: dateOfBirth,
+  //     gender: gender,
+  //     email: email,
+  //     phoneNumber: null,
+  //     avatarUrl: null,
+  //     isOptInForReceivingMarketingMessages:
+  //         isOptInForReceivingMarketingMessages,
+  //     isOptInForSharingPersonalDataForMarketingPurposes:
+  //         isOptInForSharingPersonalDataForMarketingPurposes,
+  //     hasPremiumAccount: false,
+  //     premiumPlan: null,
+  //     playlists: [],
+  //     likedSongs: [],
+  //     recentlyPlayed: [],
+  //     deviceId: '',
+  //     playingDevice: null,
+  //     connectedDevices: [],
+  //     followers: [],
+  //     following: [],
+  //     isUserArtist: false,
+  //   );
+  // }
 
   Future<void> logOutUser() async {
     await FirebaseAuth.instance.signOut();

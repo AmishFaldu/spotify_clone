@@ -18,7 +18,7 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
   final GlobalKey<CustomDatePickerWidgetState> globalKeyForDatePicker =
       GlobalKey();
 
-  Future<void> saveDOBToSecureStorage() async {
+  Future<void> saveDOBToSecureStorageAndNavigateToNextScreen() async {
     SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final dateOfBirthString =
@@ -27,6 +27,7 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
         throw "Invalid date of birth";
       }
       await storage.write(key: 'user.dateOfBirth', value: dateOfBirthString);
+      Navigator.of(context).pushNamed(SignupGenderScreen.route);
     } catch (error) {
       print(error);
     }
@@ -78,7 +79,9 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
               const SizedBox(
                 height: 40,
               ),
-              const CustomDatePickerWidget(),
+              CustomDatePickerWidget(
+                key: globalKeyForDatePicker,
+              ),
               const SizedBox(
                 height: 40,
               ),
@@ -95,8 +98,7 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
                       ),
                     ),
                     onPressed: () async {
-                      await saveDOBToSecureStorage();
-                      Navigator.of(context).pushNamed(SignupGenderScreen.route);
+                      await saveDOBToSecureStorageAndNavigateToNextScreen();
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(
