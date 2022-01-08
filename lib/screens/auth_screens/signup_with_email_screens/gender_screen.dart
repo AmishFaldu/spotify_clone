@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/confirm_create_account.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_text_button.dart';
 
 class SignupGenderScreen extends StatelessWidget {
@@ -10,12 +11,12 @@ class SignupGenderScreen extends StatelessWidget {
 
   Future<void> saveGenderToSecureStorageAndNavigateToNextScreen(
       String gender, BuildContext context) async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
     try {
-      await storage.write(key: 'user.gender', value: gender);
-
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['gender'] = gender;
       Navigator.of(context).pushNamed(SignupConfirmCreateAccount.route);
     } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
       print(error);
     }
   }

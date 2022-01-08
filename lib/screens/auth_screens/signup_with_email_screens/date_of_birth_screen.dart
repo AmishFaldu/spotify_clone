@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_date_picker.dart';
 
@@ -19,16 +20,17 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
       GlobalKey();
 
   Future<void> saveDOBToSecureStorageAndNavigateToNextScreen() async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final dateOfBirthString =
           globalKeyForDatePicker.currentState?.datePicked.toString();
       if (dateOfBirthString == null) {
         throw "Invalid date of birth";
       }
-      await storage.write(key: 'user.dateOfBirth', value: dateOfBirthString);
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['dateOfBirth'] = dateOfBirthString;
       Navigator.of(context).pushNamed(SignupGenderScreen.route);
     } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
       print(error);
     }
   }

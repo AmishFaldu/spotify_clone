@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignupPasswordScreen extends StatefulWidget {
@@ -18,15 +19,16 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
   String password = '';
 
   Future<void> savePasswordToSecureStorageAndNavigateToNextScreen() async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final isDataValid = globalKeyForFormState.currentState?.validate();
       if (password.isNotEmpty && isDataValid != true) {
         throw "Invalid password";
       }
-      await storage.write(key: 'user.password', value: password);
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['password'] = password;
       Navigator.of(context).pushNamed(SignupDateOfBirthScreen.route);
     } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
       print(error);
     }
   }
@@ -79,7 +81,6 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                       return "Password should not be empty";
                     }
 
-                    print(passwordValue.trim().length);
                     if (passwordValue.trim().length <= 8) {
                       return "Password should be greater than 8 characters";
                     }

@@ -7,7 +7,7 @@ import 'package:spotify_clone/models/song.dart';
 class SpotifyUser {
   final String uid;
   final String userName;
-  final String password;
+  final String? password;
   final String dateOfBirth;
   final String gender;
   final String? email;
@@ -49,7 +49,7 @@ class SpotifyUser {
   SpotifyUser({
     required this.uid,
     required this.userName,
-    required this.password,
+    this.password,
     required this.dateOfBirth,
     required this.gender,
     this.email,
@@ -80,65 +80,50 @@ class SpotifyUser {
 
 class SpotifyUserProvider extends ChangeNotifier {
   SpotifyUser? _userDetails;
+  final Map<String, dynamic> tempData = {};
 
-  Future<void> signInUser(String email, String password) async {
-    final userAuthResponse = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
-    final response = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(userAuthResponse.user?.uid)
-        .get();
-    final userData = response.data();
-    if (userData != null) {
-      _userDetails = SpotifyUser(
-        uid: userData['uid'],
-        userName: userData['userName'],
-        password: userData['password'],
-        dateOfBirth: userData['dateOfBirth'],
-        gender: userData['gender'],
-        email: userData['email'],
-        phoneNumber: userData['phoneNumber'],
-        avatarUrl: userData['avatarUrl'],
-        isOptInForReceivingMarketingMessages:
-            userData['isOptInForReceivingMarketingMessages'],
-        isOptInForSharingPersonalDataForMarketingPurposes:
-            userData['isOptInForSharingPersonalDataForMarketingPurposes'],
-        hasPremiumAccount: userData['hasPremiumAccount'],
-        premiumPlan: userData['premiumPlan'],
-        playlists: userData['playlists'],
-        likedSongs: userData['likedSongs'],
-        recentlyPlayed: userData['recentlyPlayed'],
-        deviceId: "",
-        playingDevice: userData['playingDevice'],
-        connectedDevices: userData['connectedDevices'],
-        followers: userData['followers'],
-        following: userData['following'],
-        isUserArtist: userData['isUserArtist'],
-        artistPopularityCount: userData['artistPopularityCount'],
-        monthlyListeners: userData['monthlyListeners'],
-        songs: userData['songs'],
-        positionInWorld: userData['positionInWorld'],
-        isVerified: userData['isVerified'],
-        photos: userData['photos'],
-        about: userData['about'],
-      );
+  Future<bool> checkIfEmailExists(String email) async {
+    try {
+      final user = await FirebaseFirestore.instance
+          .collection("users")
+          .where('email', isEqualTo: email)
+          .get();
+      if (user.size > 0) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      print(error);
     }
+    // TODO : need to show error dialog for this
+    return true;
   }
 
-  Future<void> signUpUserWithEmail({
-    required String userName,
+  Future<bool> checkIfEmailIsValid(String email) async {
+    try {
+      await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'invalid-email') {
+        return false;
+      }
+    } catch (error) {
+      // TODO : need to show error dialog for this
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> signUpUserWithEmailAndPassword({
     required String email,
     required String password,
-    required String gender,
+    required String userName,
     required String dateOfBirth,
-    required isOptInForReceivingMarketingMessages,
-    required isOptInForSharingPersonalDataForMarketingPurposes,
+    required String gender,
+    required bool isOptInForReceivingMarketingMessages,
+    required bool isOptInForSharingPersonalDataForMarketingPurposes,
   }) async {
-    final userAuthResponse = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
-
     final userData = {
-      'uid': userAuthResponse.user?.uid,
+      'uid': '12345',
       'userName': userName,
       'password': password,
       'dateOfBirth': dateOfBirth,
@@ -162,10 +147,12 @@ class SpotifyUserProvider extends ChangeNotifier {
       'following': [],
       'isUserArtist': false,
     };
+    await FirebaseFirestore.instance.collection('users').add(userData);
 
-    await FirebaseFirestore.instance.collection('user').add(userData);
+    // TODO - need to add some read uid here
+    // TODO - also need to add device id
     _userDetails = SpotifyUser(
-      uid: userAuthResponse.user!.uid,
+      uid: '12345',
       userName: userName,
       password: password,
       dateOfBirth: dateOfBirth,
@@ -191,87 +178,130 @@ class SpotifyUserProvider extends ChangeNotifier {
     );
   }
 
-  // Future<void> signUpUserWithPhoneNumber({
-  //   required String userName,
-  //   required String phoneNumber,
-  //   required String gender,
-  //   required String dateOfBirth,
-  //   required isOptInForReceivingMarketingMessages,
-  //   required isOptInForSharingPersonalDataForMarketingPurposes,
-  // }) async {
-  //   final userAuthResponse = await FirebaseAuth.instance.verifyPhoneNumber(
-  //     phoneNumber: phoneNumber,
-  //     timeout: Duration(minutes: 5),
-  //     forceResendingToken: 2,
-  //     verificationFailed: (exception) {
-  //       print(exception);
-  //     },
-  //     codeAutoRetrievalTimeout: (verificationId) {
-  //       print("timeout for verification id $verificationId");
-  //     },
-  //     codeSent: (verificationId, forceResendingToken) {
-  //
-  //     },
-  //     verificationCompleted: (PhoneAuthCredential _creds) {
-  //       print(_creds);
-  //     },
-  //   );
-  //
-  //   final userData = {
-  //     'uid': userAuthResponse.user?.uid,
-  //     'userName': userName,
-  //     'password': password,
-  //     'dateOfBirth': dateOfBirth,
-  //     'gender': gender,
-  //     'email': email,
-  //     'phoneNumber': null,
-  //     'avatarUrl': null,
-  //     'isOptInForReceivingMarketingMessages':
-  //         isOptInForReceivingMarketingMessages,
-  //     'isOptInForSharingPersonalDataForMarketingPurposes':
-  //         isOptInForSharingPersonalDataForMarketingPurposes,
-  //     'hasPremiumAccount': false,
-  //     'premiumPlan': null,
-  //     'playlists': [],
-  //     'likedSongs': [],
-  //     'recentlyPlayed': [],
-  //     'deviceId': '',
-  //     'playingDevice': null,
-  //     'connectedDevices': [],
-  //     'followers': [],
-  //     'following': [],
-  //     'isUserArtist': false,
-  //   };
-  //
-  //   await FirebaseFirestore.instance.collection('user').add(userData);
-  //   _userDetails = User(
-  //     uid: userAuthResponse.user!.uid,
-  //     userName: userName,
-  //     password: password,
-  //     dateOfBirth: dateOfBirth,
-  //     gender: gender,
-  //     email: email,
-  //     phoneNumber: null,
-  //     avatarUrl: null,
-  //     isOptInForReceivingMarketingMessages:
-  //         isOptInForReceivingMarketingMessages,
-  //     isOptInForSharingPersonalDataForMarketingPurposes:
-  //         isOptInForSharingPersonalDataForMarketingPurposes,
-  //     hasPremiumAccount: false,
-  //     premiumPlan: null,
-  //     playlists: [],
-  //     likedSongs: [],
-  //     recentlyPlayed: [],
-  //     deviceId: '',
-  //     playingDevice: null,
-  //     connectedDevices: [],
-  //     followers: [],
-  //     following: [],
-  //     isUserArtist: false,
-  //   );
-  // }
+  Future<bool> checkIfPhoneNumberExists(String phoneNumber) async {
+    try {
+      final user = await FirebaseFirestore.instance
+          .collection("users")
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+      if (user.size > 0) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      // TODO : need to show error dialog for this
+      print(error);
+    }
+    return true;
+  }
 
-  Future<void> logOutUser() async {
-    await FirebaseAuth.instance.signOut();
+  Future<void> verifyPhoneNumber({
+    required String phoneNumber,
+    required void Function(String, int?) codeSentFunction,
+  }) async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (_creds) {
+          print(_creds);
+        },
+        verificationFailed: (exception) {
+          print(exception);
+        },
+        codeSent: codeSentFunction,
+        codeAutoRetrievalTimeout: (verificationId) {
+          print(verificationId);
+        },
+      );
+    } catch (error) {
+      // TODO : need to show error dialog for this
+      print(error);
+    }
+  }
+
+  Future<void> verifySmsVerificationCode({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    final creds = PhoneAuthProvider.credential(
+        verificationId: verificationId, smsCode: smsCode);
+    await FirebaseAuth.instance.signInWithCredential(creds);
+  }
+
+  Future<void> signUpUserWithPhoneNumber({
+    required String phoneNumber,
+    required String userName,
+    required String dateOfBirth,
+    required String gender,
+    required bool isOptInForReceivingMarketingMessages,
+    required bool isOptInForSharingPersonalDataForMarketingPurposes,
+  }) async {
+    try {
+      // TODO - need to add read uid and deviceid
+      final userData = {
+        'uid': '12345',
+        'userName': userName,
+        'password': null,
+        'dateOfBirth': dateOfBirth,
+        'gender': gender,
+        'email': null,
+        'phoneNumber': phoneNumber,
+        'avatarUrl': null,
+        'isOptInForReceivingMarketingMessages':
+        isOptInForReceivingMarketingMessages,
+        'isOptInForSharingPersonalDataForMarketingPurposes':
+        isOptInForSharingPersonalDataForMarketingPurposes,
+        'hasPremiumAccount': false,
+        'premiumPlan': null,
+        'playlists': [],
+        'likedSongs': [],
+        'recentlyPlayed': [],
+        'deviceId': '',
+        'playingDevice': null,
+        'connectedDevices': [],
+        'followers': [],
+        'following': [],
+        'isUserArtist': false,
+      };
+      await FirebaseFirestore.instance.collection('users').add(userData);
+      _userDetails = SpotifyUser(
+        uid: '12345',
+        userName: userName,
+        password: null,
+        dateOfBirth: dateOfBirth,
+        gender: gender,
+        email: null,
+        phoneNumber: phoneNumber,
+        avatarUrl: null,
+        isOptInForReceivingMarketingMessages:
+        isOptInForReceivingMarketingMessages,
+        isOptInForSharingPersonalDataForMarketingPurposes:
+        isOptInForSharingPersonalDataForMarketingPurposes,
+        hasPremiumAccount: false,
+        premiumPlan: null,
+        playlists: [],
+        likedSongs: [],
+        recentlyPlayed: [],
+        deviceId: '',
+        playingDevice: null,
+        connectedDevices: [],
+        followers: [],
+        following: [],
+        isUserArtist: false,
+      );
+    } catch (error) {
+      // TODO : need to show error dialog for this
+      print(error);
+    }
+  }
+
+  Future<void> postSignupCleanUp() async {
+    try {
+      await FirebaseAuth.instance.currentUser?.delete();
+      tempData.clear();
+    } catch (error) {
+      // TODO : need to show error dialog for this
+      print(error);
+    }
   }
 }

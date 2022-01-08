@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/home_screen.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_tappable_checkbox.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,37 +26,45 @@ class _SignupConfirmCreateAccountState
   GlobalKey<FormState> formGlobalKey = GlobalKey();
 
   void signupUser(BuildContext context) async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final isFormDataValid = formGlobalKey.currentState?.validate();
       if (userName.trim().isNotEmpty && isFormDataValid == true) {
-        final email = await storage.read(key: 'user.email') as String;
-        final password = await storage.read(key: 'user.password') as String;
-        final gender = await storage.read(key: 'user.gender') as String;
-        final dateOfBirth =
-            await storage.read(key: 'user.dateOfBirth') as String;
-        // final phoneNumber =
-        //     await storage.read(key: 'user.phoneNumber') as String;
-
-        await Provider.of<SpotifyUserProvider>(context, listen: false)
-            .signUpUserWithEmail(
-          userName: userName,
-          email: email,
-          password: password,
-          gender: gender,
-          dateOfBirth: dateOfBirth,
-          isOptInForReceivingMarketingMessages:
-              !receivingMarketingMessagesCheckBox,
-          isOptInForSharingPersonalDataForMarketingPurposes:
-              sharingPersonalDataForMarketingPurposesCheckBox,
-        );
-        await storage.deleteAll();
+        final tempUserData =
+            Provider.of<SpotifyUserProvider>(context, listen: false).tempData;
+        if (tempUserData['isEmailAuth']) {
+          await Provider.of<SpotifyUserProvider>(context, listen: false)
+              .signUpUserWithEmailAndPassword(
+            email: tempUserData['email'],
+            password: tempUserData['password'],
+            userName: userName,
+            dateOfBirth: tempUserData['dateOfBirth'],
+            gender: tempUserData['gender'],
+            isOptInForReceivingMarketingMessages:
+                receivingMarketingMessagesCheckBox,
+            isOptInForSharingPersonalDataForMarketingPurposes:
+                sharingPersonalDataForMarketingPurposesCheckBox,
+          );
+        } else {
+          await Provider.of<SpotifyUserProvider>(context, listen: false)
+              .signUpUserWithPhoneNumber(
+            phoneNumber: tempUserData['phoneNumber'],
+            userName: userName,
+            dateOfBirth: tempUserData['dateOfBirth'],
+            gender: tempUserData['gender'],
+            isOptInForReceivingMarketingMessages:
+                receivingMarketingMessagesCheckBox,
+            isOptInForSharingPersonalDataForMarketingPurposes:
+                sharingPersonalDataForMarketingPurposesCheckBox,
+          );
+        }
+        await Provider.of<SpotifyUserProvider>(context).postSignupCleanUp();
         Navigator.of(context).pushNamedAndRemoveUntil(
           HomeScreen.route,
           (route) => false,
         );
       }
     } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
       print(error);
     }
   }

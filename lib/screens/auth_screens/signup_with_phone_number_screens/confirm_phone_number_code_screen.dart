@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/functions_for_confirm_code.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/focusable_text_form_field.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class ConfirmPhoneNumberCode extends StatefulWidget {
@@ -47,16 +48,36 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
     return false;
   }
 
-  Future<void> savePhoneNumberToSecureStorage(String phoneNumber,
-      List<TextEditingController> textEditingControllers) async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
+  Future<void> sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
+    String phoneNumber,
+    List<TextEditingController> textEditingControllers,
+  ) async {
     try {
       final isDataValid = isValidCode(textEditingControllers);
       if (isDataValid != true) {
         throw "Invalid code";
       }
-      await storage.write(key: 'user.phoneNumber', value: phoneNumber);
+
+      final String verificationId =
+          Provider.of<SpotifyUserProvider>(context, listen: false)
+              .tempData['phoneNumberAuthVerificationId'];
+      String smsCode = firstTextEditingController.text;
+      smsCode = '$smsCode${secondTextEditingController.text}';
+      smsCode = '$smsCode${thirdTextEditingController.text}';
+      smsCode = '$smsCode${fourthTextEditingController.text}';
+      smsCode = '$smsCode${fifthTextEditingController.text}';
+      smsCode = '$smsCode${sixthTextEditingController.text}';
+
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['phoneNumber'] = phoneNumber;
+      await Provider.of<SpotifyUserProvider>(context, listen: false)
+          .verifySmsVerificationCode(
+              verificationId: verificationId, smsCode: smsCode);
+      Navigator.of(context).pushReplacementNamed(
+        SignupDateOfBirthScreen.route,
+      );
     } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
       print(error);
     }
   }
@@ -198,7 +219,7 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
             ),
             Container(
               alignment: Alignment.center,
-              margin: EdgeInsets.symmetric(vertical: 40),
+              margin: const EdgeInsets.symmetric(vertical: 40),
               child: CustomBouncingButton(
                 child: ElevatedButton(
                   child: Center(
@@ -212,10 +233,9 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
                   ),
                   onPressed: showNextButton
                       ? () async {
-                          await savePhoneNumberToSecureStorage(
-                              phoneNumber, textEditingControllers);
-                          Navigator.of(context).pushReplacementNamed(
-                            SignupDateOfBirthScreen.route,
+                          await sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
+                            phoneNumber,
+                            textEditingControllers,
                           );
                         }
                       : null,
@@ -244,7 +264,12 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
             Center(
               child: CustomBouncingButton(
                 child: TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
+                      phoneNumber,
+                      textEditingControllers,
+                    );
+                  },
                   icon: Icon(
                     Icons.textsms_outlined,
                     color: Theme.of(context).iconTheme.color,
@@ -259,7 +284,7 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Center(

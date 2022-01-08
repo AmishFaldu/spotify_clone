@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
-import 'package:spotify_clone/utils/secure_flutter_storage.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_alert_dialog_box.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
@@ -26,7 +26,6 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
   );
 
   Future<void> saveEmailToSecureStorageAndNavigateToNextScreen() async {
-    SecureFlutterStorage storage = SecureFlutterStorage();
     try {
       final isDataValid = globalKeyForEmailFormField.currentState?.validate();
       if (isDataValid != true) {
@@ -35,86 +34,43 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
         return;
       }
 
-      final methods =
-          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-      if (methods.isNotEmpty) {
+      final isUserEmailValid =
+          await Provider.of<SpotifyUserProvider>(context, listen: false)
+              .checkIfEmailIsValid(email);
+
+      if (!isUserEmailValid) {
+        messageBelowEmailField = 'Invalid email address entered';
+        setState(() {});
+      }
+
+      final isUserWithEmailAlreadyExists =
+          await Provider.of<SpotifyUserProvider>(context, listen: false)
+              .checkIfEmailExists(email);
+
+      /// Temp data which will be used at the end of auth flow
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['isEmailAuth'] = true;
+      Provider.of<SpotifyUserProvider>(context, listen: false)
+          .tempData['email'] = email;
+
+      if (isUserWithEmailAlreadyExists) {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => CustomAlertDialogBox(
-              title: Text(
-                "This email is already connected to an account.",
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.black),
-              ),
-              description: Text(
-                "Do you want to login instead?",
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText2!
-                    .copyWith(color: Colors.black),
-              ),
-              actions: [
-                Center(
-                  child: CustomBouncingButton(
-                    child: ElevatedButton(
-                      child: Center(
-                        child: Text(
-                          "GO TO LOGIN",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(letterSpacing: .2, color: Colors.black),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            LoginScreen.route, (route) => route.isFirst);
-                      },
-                      style: ButtonStyle(
-                        // alignment: Alignment.centerLeft,
-                        splashFactory: NoSplash.splashFactory,
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Center(
-                  child: CustomBouncingButton(
-                    child: ElevatedButton(
-                      child: Center(
-                        child: Text(
-                          "CLOSE",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(letterSpacing: .2, color: Colors.black),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
-                      },
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.transparent),
-                        splashFactory: NoSplash.splashFactory,
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
+              title: "This email is already connected to an account.",
+              description: "Do you want to login instead?",
+              actions: const [
+                "GO TO LOGIN",
+                "CLOSE",
+              ],
+              actionFunctions: [
+                () {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      LoginScreen.route, (route) => route.isFirst);
+                },
+                () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
               ],
             ),
           ),
@@ -122,16 +78,7 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
         return;
       }
 
-      await storage.write(key: 'user.email', value: email);
       Navigator.of(context).pushNamed(SignupPasswordScreen.route);
-    } on FirebaseAuthException catch (error) {
-      if (error.code == 'invalid-email') {
-        messageBelowEmailField = 'Invalid email address entered';
-        setState(() {});
-      } else {
-        // TODO = need to add a dialog to show error occured and need to try again
-        print(error);
-      }
     } catch (error) {
       // TODO = need to add a dialog to show error occured and need to try again
       print(error);

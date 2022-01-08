@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
+import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/confirm_phone_number_code_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/gesture_detector.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/country_codes_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/gesture_detector.dart';
+import 'package:spotify_clone/widgets/custom_widgets/custom_alert_dialog_box.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class PhoneNumberAuth extends StatefulWidget {
   static const route = '/signup-with-phone-number-auth-screen';
+
   const PhoneNumberAuth({
     Key? key,
   }) : super(key: key);
@@ -20,13 +25,77 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
   String countryName = 'India';
   String countryCode = '+91';
   String phoneNumber = "";
+  GlobalKey<FormState> globalKeyForPhoneNumberTextFormField = GlobalKey();
+
+  Future<void> sendVerificationCodeAndNavigateToNextScreen(
+      BuildContext context) async {
+    final phoneNumberWithCountryCode = '$countryCode$phoneNumber';
+    try {
+      final isDataValid =
+          globalKeyForPhoneNumberTextFormField.currentState?.validate();
+      if (isDataValid == true && phoneNumber.trim().isNotEmpty) {
+        final isUserWithPhoneNumberAlreadyExists =
+            await Provider.of<SpotifyUserProvider>(context, listen: false)
+                .checkIfPhoneNumberExists(phoneNumberWithCountryCode);
+
+        /// Temp data which will be used at the end of auth flow
+        Provider.of<SpotifyUserProvider>(context, listen: false)
+            .tempData['isEmailAuth'] = false;
+
+        if (isUserWithPhoneNumberAlreadyExists) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => CustomAlertDialogBox(
+                title: "This phone number is already connected to an account.",
+                description: "Do you want to login instead?",
+                actions: const [
+                  "GO TO LOGIN",
+                  "CLOSE",
+                ],
+                actionFunctions: [
+                  () {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        LoginScreen.route, (route) => route.isFirst);
+                  },
+                  () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                ],
+              ),
+            ),
+          );
+          return;
+        }
+
+        await Provider.of<SpotifyUserProvider>(context, listen: false)
+            .verifyPhoneNumber(
+          phoneNumber: phoneNumberWithCountryCode,
+          codeSentFunction: (verificationId, forceRetries) {
+            Provider.of<SpotifyUserProvider>(context, listen: false)
+                .tempData['phoneNumberAuthVerificationId'] = verificationId;
+
+            final ConfirmPhoneNumberCodeArguments args =
+                ConfirmPhoneNumberCodeArguments(
+                    phoneNumber: '$countryCode$phoneNumber');
+            Navigator.of(context).pushNamed(
+              ConfirmPhoneNumberCode.route,
+              arguments: args,
+            );
+          },
+        );
+      }
+    } catch (error) {
+      // TODO = need to add a dialog to show error occured and need to try again
+      print(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Container(
-        margin: EdgeInsets.only(
+        margin: const EdgeInsets.only(
           left: 20,
           top: 20,
           right: 20,
@@ -38,7 +107,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
               "Enter phone number",
               style: Theme.of(context).textTheme.headline5,
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             Container(
@@ -50,7 +119,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                 children: [
                   GestureDetectorPhoneNumberWidget(
                     width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                           width: 1,
@@ -67,7 +136,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                         Expanded(
                           child: Text(''),
                         ),
-                        Icon(
+                        const Icon(
                           Icons.keyboard_arrow_right_outlined,
                           color: Colors.white,
                         ),
@@ -91,58 +160,74 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     child: Row(
                       children: [
                         GestureDetectorPhoneNumberWidget(
-                            height: double.infinity,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  width: 1,
-                                  color: Colors.white,
-                                ),
+                          height: double.infinity,
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                width: 1,
+                                color: Colors.white,
                               ),
                             ),
-                            child: Center(
-                              child: Text(
-                                countryCode,
-                                textAlign: TextAlign.center,
-                              ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              countryCode,
+                              textAlign: TextAlign.center,
                             ),
-                            onTap: () {
-                              Navigator.of(context)
-                                  .pushNamed(CountryCodeScreen.route)
-                                  .then((value) {
-                                if (value != null) {
-                                  countryName = (value as List<String>)[0];
-                                  countryCode = (value)[1];
-                                  setState(() {});
-                                }
-                              });
-                            }),
-                        SizedBox(
+                          ),
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed(CountryCodeScreen.route)
+                                .then((value) {
+                              if (value != null) {
+                                countryName = (value as List<String>)[0];
+                                countryCode = (value)[1];
+                                setState(() {});
+                              }
+                            });
+                          },
+                        ),
+                        const SizedBox(
                           width: 20,
                         ),
                         Expanded(
-                          child: TextFormField(
-                            onChanged: (phoneValue) {
-                              if (phoneValue.isNotEmpty &&
-                                  !RegExp(r'[^0-9]').hasMatch(phoneValue)) {
+                          child: Form(
+                            key: globalKeyForPhoneNumberTextFormField,
+                            child: TextFormField(
+                              validator: (phoneNumberValue) {
+                                if (phoneNumberValue == null ||
+                                    phoneNumberValue.trim().isEmpty) {
+                                  return "Phone Number should not be null.";
+                                }
+
+                                if (phoneNumberValue.trim().length > 10 ||
+                                    phoneNumber.trim().length > 10) {
+                                  return "Phone number should be 10 digits only.";
+                                }
+                              },
+                              onChanged: (phoneValue) {
                                 phoneNumber = phoneValue;
-                                isPhoneNumberEntered = true;
+                                if (phoneValue.isNotEmpty &&
+                                    !RegExp(r'[^0-9]').hasMatch(phoneValue)) {
+                                  isPhoneNumberEntered = true;
+                                  setState(() {});
+                                  return;
+                                }
+                                isPhoneNumberEntered = false;
                                 setState(() {});
-                                return;
-                              }
-                              isPhoneNumberEntered = false;
-                              setState(() {});
-                            },
-                            enableSuggestions: true,
-                            initialValue: '',
-                            autofocus: true,
-                            textInputAction: TextInputAction.done,
-                            keyboardType: TextInputType.number,
-                            cursorColor: Colors.white,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: "Phone number",
-                              hintStyle: TextStyle(color: Colors.white),
+                              },
+                              // maxLength: 10,
+                              enableSuggestions: true,
+                              initialValue: '',
+                              autofocus: true,
+                              textInputAction: TextInputAction.done,
+                              keyboardType: TextInputType.number,
+                              cursorColor: Colors.white,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Phone number",
+                                hintStyle: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ),
@@ -163,7 +248,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     fontSize: 12,
                   ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Text(
@@ -174,7 +259,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     fontSize: 12,
                   ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Center(
@@ -190,13 +275,9 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                     ),
                   ),
                   onPressed: isPhoneNumberEntered
-                      ? () {
-                          Navigator.of(context).pushNamed(
-                            ConfirmPhoneNumberCode.route,
-                            arguments: ConfirmPhoneNumberCodeArguments(
-                              phoneNumber: "$countryCode$phoneNumber",
-                            ),
-                          );
+                      ? () async {
+                          await sendVerificationCodeAndNavigateToNextScreen(
+                              context);
                         }
                       : null,
                   style: ButtonStyle(
