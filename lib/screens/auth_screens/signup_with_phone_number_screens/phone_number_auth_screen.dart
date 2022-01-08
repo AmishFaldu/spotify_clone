@@ -58,7 +58,7 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                         LoginScreen.route, (route) => route.isFirst);
                   },
                   () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    Navigator.of(context).pop();
                   }
                 ],
               ),
@@ -83,6 +83,14 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
             );
           },
         );
+        // final ConfirmPhoneNumberCodeArguments args =
+        //     ConfirmPhoneNumberCodeArguments(
+        //   phoneNumber: '$countryCode$phoneNumber',
+        // );
+        // Navigator.of(context).pushNamed(
+        //   ConfirmPhoneNumberCode.route,
+        //   arguments: args,
+        // );
       }
     } catch (error) {
       // TODO = need to add a dialog to show error occured and need to try again

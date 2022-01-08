@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
+import 'package:spotify_clone/screens/auth_screens/common_screens/confirm_create_account.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
+import 'package:spotify_clone/utils/password_screen_args.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignupPasswordScreen extends StatefulWidget {
   static const route = '/signup-login-screen';
 
-  const SignupPasswordScreen({Key? key}) : super(key: key);
+  const SignupPasswordScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _SignupPasswordScreenState createState() => _SignupPasswordScreenState();
@@ -18,7 +22,8 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
   GlobalKey<FormState> globalKeyForFormState = GlobalKey();
   String password = '';
 
-  Future<void> savePasswordToSecureStorageAndNavigateToNextScreen() async {
+  Future<void> savePasswordToSecureStorageAndNavigateToNextScreen(
+      bool navigateToConfirmCreateAccountNext) async {
     try {
       final isDataValid = globalKeyForFormState.currentState?.validate();
       if (password.isNotEmpty && isDataValid != true) {
@@ -26,6 +31,11 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
       }
       Provider.of<SpotifyUserProvider>(context, listen: false)
           .tempData['password'] = password;
+
+      if (navigateToConfirmCreateAccountNext) {
+        Navigator.of(context).pushNamed(SignupConfirmCreateAccount.route);
+        return;
+      }
       Navigator.of(context).pushNamed(SignupDateOfBirthScreen.route);
     } catch (error) {
       // TODO = need to add a dialog to show error occured and need to try again
@@ -35,6 +45,9 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)?.settings.arguments as PasswordScreenArgs;
+
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
@@ -136,7 +149,9 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                   ),
                   onPressed: isValidPassword
                       ? () async {
-                          await savePasswordToSecureStorageAndNavigateToNextScreen();
+                          await savePasswordToSecureStorageAndNavigateToNextScreen(
+                            args.navigateToConfirmCreateAccountNext,
+                          );
                         }
                       : null,
                   style: ButtonStyle(

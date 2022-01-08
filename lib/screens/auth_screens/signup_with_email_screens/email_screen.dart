@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
+import 'package:spotify_clone/utils/password_screen_args.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_alert_dialog_box.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
@@ -69,7 +70,7 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                       LoginScreen.route, (route) => route.isFirst);
                 },
                 () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  Navigator.of(context).pop();
                 }
               ],
             ),
@@ -78,7 +79,12 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
         return;
       }
 
-      Navigator.of(context).pushNamed(SignupPasswordScreen.route);
+      Navigator.of(context).pushNamed(
+        SignupPasswordScreen.route,
+        arguments: PasswordScreenArgs(
+          navigateToConfirmCreateAccountNext: false,
+        ),
+      );
     } catch (error) {
       // TODO = need to add a dialog to show error occured and need to try again
       print(error);

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/widgets/home_screen_widgets/top_bar.dart';
 import 'package:spotify_clone/widgets/home_screen_widgets/top_played.dart';
 
@@ -11,6 +13,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     double topUIOverlaySize = MediaQuery.of(context).padding.top;
+    // Provider.of<SpotifyUserProvider>(context).logOutUser();
 
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,

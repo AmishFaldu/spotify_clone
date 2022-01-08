@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/auth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/confirm_create_account.dart';
+import 'package:spotify_clone/screens/auth_screens/common_screens/confirm_create_account.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/email_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';

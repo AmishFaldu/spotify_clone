@@ -84,11 +84,9 @@ class SpotifyUserProvider extends ChangeNotifier {
 
   Future<bool> checkIfEmailExists(String email) async {
     try {
-      final user = await FirebaseFirestore.instance
-          .collection("users")
-          .where('email', isEqualTo: email)
-          .get();
-      if (user.size > 0) {
+      final user =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (user.isNotEmpty) {
         return true;
       }
       return false;
@@ -122,8 +120,15 @@ class SpotifyUserProvider extends ChangeNotifier {
     required bool isOptInForReceivingMarketingMessages,
     required bool isOptInForSharingPersonalDataForMarketingPurposes,
   }) async {
+    final firebaseAuthUser =
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    final userId = firebaseAuthUser.user?.uid ?? '';
+
     final userData = {
-      'uid': '12345',
+      'uid': userId,
       'userName': userName,
       'password': password,
       'dateOfBirth': dateOfBirth,
@@ -149,10 +154,9 @@ class SpotifyUserProvider extends ChangeNotifier {
     };
     await FirebaseFirestore.instance.collection('users').add(userData);
 
-    // TODO - need to add some read uid here
     // TODO - also need to add device id
     _userDetails = SpotifyUser(
-      uid: '12345',
+      uid: userId,
       userName: userName,
       password: password,
       dateOfBirth: dateOfBirth,
@@ -213,6 +217,8 @@ class SpotifyUserProvider extends ChangeNotifier {
           print(verificationId);
         },
       );
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'too-many-requests') {}
     } catch (error) {
       // TODO : need to show error dialog for this
       print(error);
@@ -237,9 +243,10 @@ class SpotifyUserProvider extends ChangeNotifier {
     required bool isOptInForSharingPersonalDataForMarketingPurposes,
   }) async {
     try {
-      // TODO - need to add read uid and deviceid
+      // TODO - need to add read deviceid
+      final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
       final userData = {
-        'uid': '12345',
+        'uid': userId,
         'userName': userName,
         'password': null,
         'dateOfBirth': dateOfBirth,
@@ -248,9 +255,9 @@ class SpotifyUserProvider extends ChangeNotifier {
         'phoneNumber': phoneNumber,
         'avatarUrl': null,
         'isOptInForReceivingMarketingMessages':
-        isOptInForReceivingMarketingMessages,
+            isOptInForReceivingMarketingMessages,
         'isOptInForSharingPersonalDataForMarketingPurposes':
-        isOptInForSharingPersonalDataForMarketingPurposes,
+            isOptInForSharingPersonalDataForMarketingPurposes,
         'hasPremiumAccount': false,
         'premiumPlan': null,
         'playlists': [],
@@ -265,7 +272,7 @@ class SpotifyUserProvider extends ChangeNotifier {
       };
       await FirebaseFirestore.instance.collection('users').add(userData);
       _userDetails = SpotifyUser(
-        uid: '12345',
+        uid: userId,
         userName: userName,
         password: null,
         dateOfBirth: dateOfBirth,
@@ -274,9 +281,9 @@ class SpotifyUserProvider extends ChangeNotifier {
         phoneNumber: phoneNumber,
         avatarUrl: null,
         isOptInForReceivingMarketingMessages:
-        isOptInForReceivingMarketingMessages,
+            isOptInForReceivingMarketingMessages,
         isOptInForSharingPersonalDataForMarketingPurposes:
-        isOptInForSharingPersonalDataForMarketingPurposes,
+            isOptInForSharingPersonalDataForMarketingPurposes,
         hasPremiumAccount: false,
         premiumPlan: null,
         playlists: [],
@@ -295,13 +302,11 @@ class SpotifyUserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> postSignupCleanUp() async {
-    try {
-      await FirebaseAuth.instance.currentUser?.delete();
-      tempData.clear();
-    } catch (error) {
-      // TODO : need to show error dialog for this
-      print(error);
-    }
+  void postSignupCleanUp() {
+    tempData.clear();
+  }
+
+  Future<void> logOutUser() async {
+    await FirebaseAuth.instance.signOut();
   }
 }

@@ -57,7 +57,10 @@ class _SignupConfirmCreateAccountState
                 sharingPersonalDataForMarketingPurposesCheckBox,
           );
         }
-        await Provider.of<SpotifyUserProvider>(context).postSignupCleanUp();
+        Provider.of<SpotifyUserProvider>(
+          context,
+          listen: false,
+        ).postSignupCleanUp();
         Navigator.of(context).pushNamedAndRemoveUntil(
           HomeScreen.route,
           (route) => false,
@@ -82,6 +85,14 @@ class _SignupConfirmCreateAccountState
 
   @override
   Widget build(BuildContext context) {
+    final tempUserData =
+        Provider.of<SpotifyUserProvider>(context, listen: false).tempData;
+    if (tempUserData['userName'] != null &&
+        tempUserData['userName'].trim().length > 0) {
+      userName = tempUserData['userName'];
+      isValidProfileName = true;
+    }
+
     final appBar = AppBar(
       iconTheme: Theme.of(context).primaryIconTheme,
       backgroundColor: Theme.of(context).backgroundColor,
@@ -141,6 +152,7 @@ class _SignupConfirmCreateAccountState
                     child: Form(
                       key: formGlobalKey,
                       child: TextFormField(
+                        initialValue: userName,
                         validator: (profileName) {
                           if (profileName == null ||
                               profileName.trim().isEmpty) {

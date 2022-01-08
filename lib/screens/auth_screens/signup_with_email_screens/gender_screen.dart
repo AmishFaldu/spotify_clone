@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/confirm_create_account.dart';
+import 'package:spotify_clone/screens/auth_screens/common_screens/confirm_create_account.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_text_button.dart';
 
 class SignupGenderScreen extends StatelessWidget {

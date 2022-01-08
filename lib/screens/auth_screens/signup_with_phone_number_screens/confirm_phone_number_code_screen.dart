@@ -70,9 +70,13 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
 
       Provider.of<SpotifyUserProvider>(context, listen: false)
           .tempData['phoneNumber'] = phoneNumber;
-      await Provider.of<SpotifyUserProvider>(context, listen: false)
-          .verifySmsVerificationCode(
-              verificationId: verificationId, smsCode: smsCode);
+      await Provider.of<SpotifyUserProvider>(
+        context,
+        listen: false,
+      ).verifySmsVerificationCode(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
       Navigator.of(context).pushReplacementNamed(
         SignupDateOfBirthScreen.route,
       );
@@ -265,9 +269,18 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
               child: CustomBouncingButton(
                 child: TextButton.icon(
                   onPressed: () async {
-                    await sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
-                      phoneNumber,
-                      textEditingControllers,
+                    await Provider.of<SpotifyUserProvider>(
+                      context,
+                      listen: false,
+                    ).verifyPhoneNumber(
+                      phoneNumber: phoneNumber,
+                      codeSentFunction: (verificationId, forceRetries) {
+                        Provider.of<SpotifyUserProvider>(
+                          context,
+                          listen: false,
+                        ).tempData['phoneNumberAuthVerificationId'] =
+                            verificationId;
+                      },
                     );
                   },
                   icon: Icon(
