@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/password_screen.dart';
-import 'package:spotify_clone/utils/password_screen_args.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_alert_dialog_box.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignUpEmailScreen extends StatefulWidget {
@@ -17,79 +12,12 @@ class SignUpEmailScreen extends StatefulWidget {
 
 class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
   bool isValidEmail = false;
-  String email = '';
   String messageBelowEmailField = "You'll need to confirm this email later.";
-  final GlobalKey<FormState> globalKeyForEmailFormField = GlobalKey();
   final regex = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-z0-9]+\.[a-z]+$",
     caseSensitive: false,
     multiLine: true,
   );
-
-  Future<void> saveEmailToSecureStorageAndNavigateToNextScreen() async {
-    try {
-      final isDataValid = globalKeyForEmailFormField.currentState?.validate();
-      if (isDataValid != true) {
-        messageBelowEmailField = 'Invalid email address entered';
-        setState(() {});
-        return;
-      }
-
-      final isUserEmailValid =
-          await Provider.of<SpotifyUserProvider>(context, listen: false)
-              .checkIfEmailIsValid(email);
-
-      if (!isUserEmailValid) {
-        messageBelowEmailField = 'Invalid email address entered';
-        setState(() {});
-      }
-
-      final isUserWithEmailAlreadyExists =
-          await Provider.of<SpotifyUserProvider>(context, listen: false)
-              .checkIfEmailExists(email);
-
-      /// Temp data which will be used at the end of auth flow
-      Provider.of<SpotifyUserProvider>(context, listen: false)
-          .tempData['isEmailAuth'] = true;
-      Provider.of<SpotifyUserProvider>(context, listen: false)
-          .tempData['email'] = email;
-
-      if (isUserWithEmailAlreadyExists) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => CustomAlertDialogBox(
-              title: "This email is already connected to an account.",
-              description: "Do you want to login instead?",
-              actions: const [
-                "GO TO LOGIN",
-                "CLOSE",
-              ],
-              actionFunctions: [
-                () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      LoginScreen.route, (route) => route.isFirst);
-                },
-                () {
-                  Navigator.of(context).pop();
-                }
-              ],
-            ),
-          ),
-        );
-        return;
-      }
-
-      Navigator.of(context).pushNamed(
-        SignupPasswordScreen.route,
-        arguments: PasswordScreenArgs(
-          navigateToConfirmCreateAccountNext: false,
-        ),
-      );
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,38 +57,23 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
-              child: Form(
-                key: globalKeyForEmailFormField,
-                child: TextFormField(
-                  validator: (emailValue) {
-                    if (email.isEmpty ||
-                        emailValue == null ||
-                        emailValue.trim().isEmpty) {
-                      return "Email cannot be empty";
-                    }
-
-                    if (!regex.hasMatch(emailValue)) {
-                      return "Invalid email address";
-                    }
-                  },
-                  onChanged: (emailValue) {
-                    email = emailValue;
-                    if (emailValue.isNotEmpty && regex.hasMatch(emailValue)) {
-                      isValidEmail = true;
-                      setState(() {});
-                      return;
-                    }
-                    isValidEmail = false;
+              child: TextFormField(
+                onChanged: (emailValue) {
+                  if (emailValue.isNotEmpty && regex.hasMatch(emailValue)) {
+                    isValidEmail = true;
                     setState(() {});
-                  },
-                  enableSuggestions: true,
-                  autofocus: true,
-                  textInputAction: TextInputAction.done,
-                  keyboardType: TextInputType.emailAddress,
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                  ),
+                    return;
+                  }
+                  isValidEmail = false;
+                  setState(() {});
+                },
+                enableSuggestions: true,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                keyboardType: TextInputType.emailAddress,
+                cursorColor: Colors.white,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
                 ),
               ),
             ),
@@ -192,7 +105,9 @@ class _SignUpEmailScreenState extends State<SignUpEmailScreen> {
                   ),
                   onPressed: isValidEmail
                       ? () async {
-                          await saveEmailToSecureStorageAndNavigateToNextScreen();
+                          Navigator.of(context).pushNamed(
+                            SignupPasswordScreen.route,
+                          );
                         }
                       : null,
                   style: ButtonStyle(

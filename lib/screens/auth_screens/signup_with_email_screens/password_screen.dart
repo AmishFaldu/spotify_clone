@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/auth_screens/common_screens/confirm_create_account.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
-import 'package:spotify_clone/utils/password_screen_args.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class SignupPasswordScreen extends StatefulWidget {
@@ -19,35 +15,9 @@ class SignupPasswordScreen extends StatefulWidget {
 
 class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
   bool isValidPassword = false;
-  GlobalKey<FormState> globalKeyForFormState = GlobalKey();
-  String password = '';
-
-  Future<void> savePasswordToSecureStorageAndNavigateToNextScreen(
-      bool navigateToConfirmCreateAccountNext) async {
-    try {
-      final isDataValid = globalKeyForFormState.currentState?.validate();
-      if (password.isNotEmpty && isDataValid != true) {
-        throw "Invalid password";
-      }
-      Provider.of<SpotifyUserProvider>(context, listen: false)
-          .tempData['password'] = password;
-
-      if (navigateToConfirmCreateAccountNext) {
-        Navigator.of(context).pushNamed(SignupConfirmCreateAccount.route);
-        return;
-      }
-      Navigator.of(context).pushNamed(SignupDateOfBirthScreen.route);
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)?.settings.arguments as PasswordScreenArgs;
-
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: AppBar(
@@ -84,40 +54,25 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: Colors.grey,
               ),
-              child: Form(
-                key: globalKeyForFormState,
-                child: TextFormField(
-                  validator: (passwordValue) {
-                    if (password.trim().isEmpty ||
-                        passwordValue == null ||
-                        passwordValue.trim().isEmpty == true) {
-                      return "Password should not be empty";
-                    }
-
-                    if (passwordValue.trim().length <= 8) {
-                      return "Password should be greater than 8 characters";
-                    }
-                  },
-                  onChanged: (passwordValue) {
-                    password = passwordValue;
-                    if (passwordValue.trim().isNotEmpty &&
-                        passwordValue.trim().length > 8) {
-                      isValidPassword = true;
-                      setState(() {});
-                      return;
-                    }
-                    isValidPassword = false;
+              child: TextFormField(
+                onChanged: (passwordValue) {
+                  if (passwordValue.trim().isNotEmpty &&
+                      passwordValue.trim().length > 8) {
+                    isValidPassword = true;
                     setState(() {});
-                  },
-                  initialValue: '',
-                  autofocus: true,
-                  textInputAction: TextInputAction.done,
-                  keyboardType: TextInputType.text,
-                  obscureText: true,
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                  ),
+                    return;
+                  }
+                  isValidPassword = false;
+                  setState(() {});
+                },
+                initialValue: '',
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                keyboardType: TextInputType.text,
+                obscureText: true,
+                cursorColor: Colors.white,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
                 ),
               ),
             ),
@@ -149,8 +104,8 @@ class _SignupPasswordScreenState extends State<SignupPasswordScreen> {
                   ),
                   onPressed: isValidPassword
                       ? () async {
-                          await savePasswordToSecureStorageAndNavigateToNextScreen(
-                            args.navigateToConfirmCreateAccountNext,
+                          Navigator.of(context).pushNamed(
+                            SignupDateOfBirthScreen.route,
                           );
                         }
                       : null,

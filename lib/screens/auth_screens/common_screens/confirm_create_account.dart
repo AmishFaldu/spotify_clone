@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/home_screen.dart';
+import 'package:spotify_clone/screens/main_screens/home_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_tappable_checkbox.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,55 +20,6 @@ class _SignupConfirmCreateAccountState
   bool sharingPersonalDataForMarketingPurposesCheckBox = false;
   bool isValidProfileName = false;
   bool isCreateButtonPressed = false;
-  String userName = '';
-  GlobalKey<FormState> formGlobalKey = GlobalKey();
-
-  void signupUser(BuildContext context) async {
-    try {
-      final isFormDataValid = formGlobalKey.currentState?.validate();
-      if (userName.trim().isNotEmpty && isFormDataValid == true) {
-        final tempUserData =
-            Provider.of<SpotifyUserProvider>(context, listen: false).tempData;
-        if (tempUserData['isEmailAuth']) {
-          await Provider.of<SpotifyUserProvider>(context, listen: false)
-              .signUpUserWithEmailAndPassword(
-            email: tempUserData['email'],
-            password: tempUserData['password'],
-            userName: userName,
-            dateOfBirth: tempUserData['dateOfBirth'],
-            gender: tempUserData['gender'],
-            isOptInForReceivingMarketingMessages:
-                receivingMarketingMessagesCheckBox,
-            isOptInForSharingPersonalDataForMarketingPurposes:
-                sharingPersonalDataForMarketingPurposesCheckBox,
-          );
-        } else {
-          await Provider.of<SpotifyUserProvider>(context, listen: false)
-              .signUpUserWithPhoneNumber(
-            phoneNumber: tempUserData['phoneNumber'],
-            userName: userName,
-            dateOfBirth: tempUserData['dateOfBirth'],
-            gender: tempUserData['gender'],
-            isOptInForReceivingMarketingMessages:
-                receivingMarketingMessagesCheckBox,
-            isOptInForSharingPersonalDataForMarketingPurposes:
-                sharingPersonalDataForMarketingPurposesCheckBox,
-          );
-        }
-        Provider.of<SpotifyUserProvider>(
-          context,
-          listen: false,
-        ).postSignupCleanUp();
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          HomeScreen.route,
-          (route) => false,
-        );
-      }
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
-  }
 
   void launchUrl() async {
     try {
@@ -85,14 +34,6 @@ class _SignupConfirmCreateAccountState
 
   @override
   Widget build(BuildContext context) {
-    final tempUserData =
-        Provider.of<SpotifyUserProvider>(context, listen: false).tempData;
-    if (tempUserData['userName'] != null &&
-        tempUserData['userName'].trim().length > 0) {
-      userName = tempUserData['userName'];
-      isValidProfileName = true;
-    }
-
     final appBar = AppBar(
       iconTheme: Theme.of(context).primaryIconTheme,
       backgroundColor: Theme.of(context).backgroundColor,
@@ -149,34 +90,28 @@ class _SignupConfirmCreateAccountState
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       color: Colors.grey,
                     ),
-                    child: Form(
-                      key: formGlobalKey,
-                      child: TextFormField(
-                        initialValue: userName,
-                        validator: (profileName) {
-                          if (profileName == null ||
-                              profileName.trim().isEmpty) {
-                            return "Profile name should not be empty";
-                          }
-                        },
-                        onChanged: (profileNameValue) {
-                          userName = profileNameValue;
-                          if (profileNameValue.trim().isNotEmpty) {
-                            isValidProfileName = true;
-                            setState(() {});
-                            return;
-                          }
-                          isValidProfileName = false;
+                    child: TextFormField(
+                      validator: (profileName) {
+                        if (profileName == null || profileName.trim().isEmpty) {
+                          return "Profile name should not be empty";
+                        }
+                      },
+                      onChanged: (profileNameValue) {
+                        if (profileNameValue.trim().isNotEmpty) {
+                          isValidProfileName = true;
                           setState(() {});
-                        },
-                        enableSuggestions: true,
-                        autofocus: true,
-                        textInputAction: TextInputAction.done,
-                        keyboardType: TextInputType.emailAddress,
-                        cursorColor: Colors.white,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                        ),
+                          return;
+                        }
+                        isValidProfileName = false;
+                        setState(() {});
+                      },
+                      enableSuggestions: true,
+                      autofocus: true,
+                      textInputAction: TextInputAction.done,
+                      keyboardType: TextInputType.emailAddress,
+                      cursorColor: Colors.white,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
                       ),
                     ),
                   ),
@@ -276,7 +211,10 @@ class _SignupConfirmCreateAccountState
                                   setState(() {
                                     isCreateButtonPressed = true;
                                   });
-                                  signupUser(context);
+                                  Navigator.of(context).pushNamedAndRemoveUntil(
+                                    HomeScreen.route,
+                                    (route) => false,
+                                  );
                                 }
                               : null,
                           child: Text(

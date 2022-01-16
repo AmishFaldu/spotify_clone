@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
+import 'package:spotify_clone/screens/main_screens/home_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -54,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     isUsernameOrEmailValid = false;
                     setState(() {});
                   },
+                  autofocus: true,
                   enableSuggestions: true,
                   initialValue: '',
                   textInputAction: TextInputAction.next,
@@ -120,7 +122,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     onPressed: isPasswordValid && isUsernameOrEmailValid
-                        ? () {}
+                        ? () {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                              HomeScreen.route,
+                              (route) => false,
+                            );
+                          }
                         : null,
                     style: ButtonStyle(
                       backgroundColor: isPasswordValid && isUsernameOrEmailValid

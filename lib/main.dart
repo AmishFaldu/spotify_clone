@@ -1,12 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/auth_screens/auth_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/common_screens/confirm_create_account.dart';
+import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/email_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
@@ -14,10 +11,10 @@ import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/pas
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/link_send_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_link_screens/login_without_password_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/confirm_phone_number_code_screen.dart';
-import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/phone_number_auth_screen.dart';
-import 'package:spotify_clone/screens/home_screen.dart';
-import 'package:spotify_clone/screens/splash_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/country_codes_screen.dart';
+import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/phone_number_auth_screen.dart';
+import 'package:spotify_clone/screens/main_screens/home_screen.dart';
+import 'package:spotify_clone/screens/splash_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_scroll.dart';
 
 void main() {
@@ -170,30 +167,31 @@ class MyApp extends StatelessWidget {
           ),
           errorColor: Colors.red[300],
         ),
-        home: FutureBuilder(
-          future: Firebase.initializeApp(),
-          builder: (ctx, snapshot) {
-            if (snapshot.hasError == false &&
-                snapshot.connectionState == ConnectionState.done) {
-              return StreamBuilder<User?>(
-                stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (ctx, snapshot) {
-                  if (snapshot.hasError == false &&
-                      snapshot.connectionState != ConnectionState.waiting &&
-                      snapshot.data?.uid != null) {
-                    return const HomeScreen();
-                  } else if (snapshot.connectionState !=
-                          ConnectionState.waiting &&
-                      snapshot.data?.uid == null) {
-                    return const AuthScreen();
-                  }
-                  return const SplashScreen();
-                },
-              );
-            }
-            return const SplashScreen();
-          },
-        ),
+        home: HomeScreen(),
+        // home: FutureBuilder(
+        //   future: Firebase.initializeApp(),
+        //   builder: (ctx, snapshot) {
+        //     if (snapshot.hasError == false &&
+        //         snapshot.connectionState == ConnectionState.done) {
+        //       return StreamBuilder<User?>(
+        //         stream: FirebaseAuth.instance.authStateChanges(),
+        //         builder: (ctx, snapshot) {
+        //           if (snapshot.hasError == false &&
+        //               snapshot.connectionState != ConnectionState.waiting &&
+        //               snapshot.data?.uid != null) {
+        //             return const HomeScreen();
+        //           } else if (snapshot.connectionState !=
+        //                   ConnectionState.waiting &&
+        //               snapshot.data?.uid == null) {
+        //             return const AuthScreen();
+        //           }
+        //           return const SplashScreen();
+        //         },
+        //       );
+        //     }
+        //     return const SplashScreen();
+        //   },
+        // ),
         routes: {
           SplashScreen.route: (ctx) => const SplashScreen(),
           HomeScreen.route: (ctx) => const HomeScreen(),

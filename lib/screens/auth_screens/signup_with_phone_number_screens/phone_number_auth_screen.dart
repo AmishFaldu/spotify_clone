@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
-import 'package:spotify_clone/screens/auth_screens/login_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/confirm_phone_number_code_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/country_codes_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/widgets/gesture_detector.dart';
-import 'package:spotify_clone/widgets/custom_widgets/custom_alert_dialog_box.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 
 class PhoneNumberAuth extends StatefulWidget {
@@ -25,78 +21,6 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
   String countryName = 'India';
   String countryCode = '+91';
   String phoneNumber = "";
-  GlobalKey<FormState> globalKeyForPhoneNumberTextFormField = GlobalKey();
-
-  Future<void> sendVerificationCodeAndNavigateToNextScreen(
-      BuildContext context) async {
-    final phoneNumberWithCountryCode = '$countryCode$phoneNumber';
-    try {
-      final isDataValid =
-          globalKeyForPhoneNumberTextFormField.currentState?.validate();
-      if (isDataValid == true && phoneNumber.trim().isNotEmpty) {
-        final isUserWithPhoneNumberAlreadyExists =
-            await Provider.of<SpotifyUserProvider>(context, listen: false)
-                .checkIfPhoneNumberExists(phoneNumberWithCountryCode);
-
-        /// Temp data which will be used at the end of auth flow
-        Provider.of<SpotifyUserProvider>(context, listen: false)
-            .tempData['isEmailAuth'] = false;
-
-        if (isUserWithPhoneNumberAlreadyExists) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => CustomAlertDialogBox(
-                title: "This phone number is already connected to an account.",
-                description: "Do you want to login instead?",
-                actions: const [
-                  "GO TO LOGIN",
-                  "CLOSE",
-                ],
-                actionFunctions: [
-                  () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        LoginScreen.route, (route) => route.isFirst);
-                  },
-                  () {
-                    Navigator.of(context).pop();
-                  }
-                ],
-              ),
-            ),
-          );
-          return;
-        }
-
-        await Provider.of<SpotifyUserProvider>(context, listen: false)
-            .verifyPhoneNumber(
-          phoneNumber: phoneNumberWithCountryCode,
-          codeSentFunction: (verificationId, forceRetries) {
-            Provider.of<SpotifyUserProvider>(context, listen: false)
-                .tempData['phoneNumberAuthVerificationId'] = verificationId;
-
-            final ConfirmPhoneNumberCodeArguments args =
-                ConfirmPhoneNumberCodeArguments(
-                    phoneNumber: '$countryCode$phoneNumber');
-            Navigator.of(context).pushNamed(
-              ConfirmPhoneNumberCode.route,
-              arguments: args,
-            );
-          },
-        );
-        // final ConfirmPhoneNumberCodeArguments args =
-        //     ConfirmPhoneNumberCodeArguments(
-        //   phoneNumber: '$countryCode$phoneNumber',
-        // );
-        // Navigator.of(context).pushNamed(
-        //   ConfirmPhoneNumberCode.route,
-        //   arguments: args,
-        // );
-      }
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,43 +123,40 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                           width: 20,
                         ),
                         Expanded(
-                          child: Form(
-                            key: globalKeyForPhoneNumberTextFormField,
-                            child: TextFormField(
-                              validator: (phoneNumberValue) {
-                                if (phoneNumberValue == null ||
-                                    phoneNumberValue.trim().isEmpty) {
-                                  return "Phone Number should not be null.";
-                                }
+                          child: TextFormField(
+                            validator: (phoneNumberValue) {
+                              if (phoneNumberValue == null ||
+                                  phoneNumberValue.trim().isEmpty) {
+                                return "Phone Number should not be null.";
+                              }
 
-                                if (phoneNumberValue.trim().length > 10 ||
-                                    phoneNumber.trim().length > 10) {
-                                  return "Phone number should be 10 digits only.";
-                                }
-                              },
-                              onChanged: (phoneValue) {
-                                phoneNumber = phoneValue;
-                                if (phoneValue.isNotEmpty &&
-                                    !RegExp(r'[^0-9]').hasMatch(phoneValue)) {
-                                  isPhoneNumberEntered = true;
-                                  setState(() {});
-                                  return;
-                                }
-                                isPhoneNumberEntered = false;
+                              if (phoneNumberValue.trim().length > 10 ||
+                                  phoneNumber.trim().length > 10) {
+                                return "Phone number should be 10 digits only.";
+                              }
+                            },
+                            onChanged: (phoneValue) {
+                              phoneNumber = phoneValue;
+                              if (phoneValue.isNotEmpty &&
+                                  !RegExp(r'[^0-9]').hasMatch(phoneValue)) {
+                                isPhoneNumberEntered = true;
                                 setState(() {});
-                              },
-                              // maxLength: 10,
-                              enableSuggestions: true,
-                              initialValue: '',
-                              autofocus: true,
-                              textInputAction: TextInputAction.done,
-                              keyboardType: TextInputType.number,
-                              cursorColor: Colors.white,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Phone number",
-                                hintStyle: TextStyle(color: Colors.white),
-                              ),
+                                return;
+                              }
+                              isPhoneNumberEntered = false;
+                              setState(() {});
+                            },
+                            // maxLength: 10,
+                            enableSuggestions: true,
+                            initialValue: '',
+                            autofocus: true,
+                            textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.number,
+                            cursorColor: Colors.white,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Phone number",
+                              hintStyle: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
@@ -284,8 +205,14 @@ class _PhoneNumberAuthState extends State<PhoneNumberAuth> {
                   ),
                   onPressed: isPhoneNumberEntered
                       ? () async {
-                          await sendVerificationCodeAndNavigateToNextScreen(
-                              context);
+                          final ConfirmPhoneNumberCodeArguments args =
+                              ConfirmPhoneNumberCodeArguments(
+                            phoneNumber: '$countryCode$phoneNumber',
+                          );
+                          Navigator.of(context).pushNamed(
+                            ConfirmPhoneNumberCode.route,
+                            arguments: args,
+                          );
                         }
                       : null,
                   style: ButtonStyle(

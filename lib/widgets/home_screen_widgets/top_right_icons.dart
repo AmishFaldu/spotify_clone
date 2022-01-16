@@ -6,6 +6,7 @@ class TopRightIcons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         IconButton(
           onPressed: () {},

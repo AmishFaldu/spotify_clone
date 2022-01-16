@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/gender_screen.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_bouncing_button.dart';
 import 'package:spotify_clone/widgets/custom_widgets/custom_date_picker.dart';
@@ -16,25 +14,6 @@ class SignupDateOfBirthScreen extends StatefulWidget {
 }
 
 class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
-  final GlobalKey<CustomDatePickerWidgetState> globalKeyForDatePicker =
-      GlobalKey();
-
-  Future<void> saveDOBToSecureStorageAndNavigateToNextScreen() async {
-    try {
-      final dateOfBirthString =
-          globalKeyForDatePicker.currentState?.datePicked.toString();
-      if (dateOfBirthString == null) {
-        throw "Invalid date of birth";
-      }
-      Provider.of<SpotifyUserProvider>(context, listen: false)
-          .tempData['dateOfBirth'] = dateOfBirthString;
-      Navigator.of(context).pushNamed(SignupGenderScreen.route);
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -81,9 +60,7 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
               const SizedBox(
                 height: 40,
               ),
-              CustomDatePickerWidget(
-                key: globalKeyForDatePicker,
-              ),
+              const CustomDatePickerWidget(),
               const SizedBox(
                 height: 40,
               ),
@@ -100,7 +77,7 @@ class _SignupDateOfBirthScreenState extends State<SignupDateOfBirthScreen> {
                       ),
                     ),
                     onPressed: () async {
-                      await saveDOBToSecureStorageAndNavigateToNextScreen();
+                      Navigator.of(context).pushNamed(SignupGenderScreen.route);
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(

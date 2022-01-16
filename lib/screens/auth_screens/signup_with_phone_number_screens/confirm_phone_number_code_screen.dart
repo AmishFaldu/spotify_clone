@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:spotify_clone/models/user.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_email_screens/date_of_birth_screen.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/confirm_phone_number_code_args.dart';
 import 'package:spotify_clone/screens/auth_screens/signup_with_phone_number_screens/utils/functions_for_confirm_code.dart';
@@ -46,44 +44,6 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
       return true;
     }
     return false;
-  }
-
-  Future<void> sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
-    String phoneNumber,
-    List<TextEditingController> textEditingControllers,
-  ) async {
-    try {
-      final isDataValid = isValidCode(textEditingControllers);
-      if (isDataValid != true) {
-        throw "Invalid code";
-      }
-
-      final String verificationId =
-          Provider.of<SpotifyUserProvider>(context, listen: false)
-              .tempData['phoneNumberAuthVerificationId'];
-      String smsCode = firstTextEditingController.text;
-      smsCode = '$smsCode${secondTextEditingController.text}';
-      smsCode = '$smsCode${thirdTextEditingController.text}';
-      smsCode = '$smsCode${fourthTextEditingController.text}';
-      smsCode = '$smsCode${fifthTextEditingController.text}';
-      smsCode = '$smsCode${sixthTextEditingController.text}';
-
-      Provider.of<SpotifyUserProvider>(context, listen: false)
-          .tempData['phoneNumber'] = phoneNumber;
-      await Provider.of<SpotifyUserProvider>(
-        context,
-        listen: false,
-      ).verifySmsVerificationCode(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
-      Navigator.of(context).pushReplacementNamed(
-        SignupDateOfBirthScreen.route,
-      );
-    } catch (error) {
-      // TODO = need to add a dialog to show error occured and need to try again
-      print(error);
-    }
   }
 
   @override
@@ -237,9 +197,8 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
                   ),
                   onPressed: showNextButton
                       ? () async {
-                          await sendSMSCodeAndVerifyPhoneNumberAndNavigateToAnotherScreen(
-                            phoneNumber,
-                            textEditingControllers,
+                          Navigator.of(context).pushNamed(
+                            SignupDateOfBirthScreen.route,
                           );
                         }
                       : null,
@@ -268,21 +227,7 @@ class _ConfirmPhoneNumberCodeState extends State<ConfirmPhoneNumberCode> {
             Center(
               child: CustomBouncingButton(
                 child: TextButton.icon(
-                  onPressed: () async {
-                    await Provider.of<SpotifyUserProvider>(
-                      context,
-                      listen: false,
-                    ).verifyPhoneNumber(
-                      phoneNumber: phoneNumber,
-                      codeSentFunction: (verificationId, forceRetries) {
-                        Provider.of<SpotifyUserProvider>(
-                          context,
-                          listen: false,
-                        ).tempData['phoneNumberAuthVerificationId'] =
-                            verificationId;
-                      },
-                    );
-                  },
+                  onPressed: () async {},
                   icon: Icon(
                     Icons.textsms_outlined,
                     color: Theme.of(context).iconTheme.color,

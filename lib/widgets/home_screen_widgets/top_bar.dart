@@ -7,12 +7,18 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Salutation(),
-        TopRightIcons(),
-      ],
+    final deviceWidth = MediaQuery.of(context).size.width - 30;
+
+    return Container(
+      height: 50,
+      width: deviceWidth,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: const [
+          Salutation(),
+          TopRightIcons(),
+        ],
+      ),
     );
   }
 }
