@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class CustomBouncingButton extends StatefulWidget {
   final Widget child;
-  const CustomBouncingButton({Key? key, required this.child}) : super(key: key);
+  final double finalSmallScale;
+  const CustomBouncingButton({
+    Key? key,
+    required this.child,
+    this.finalSmallScale = 0.06,
+  }) : super(key: key);
 
   @override
   _CustomBouncingButtonState createState() => _CustomBouncingButtonState();
@@ -18,7 +23,7 @@ class _CustomBouncingButtonState extends State<CustomBouncingButton>
     animationController = AnimationController(
       vsync: this,
       lowerBound: 0.0,
-      upperBound: 0.06,
+      upperBound: widget.finalSmallScale,
       duration: const Duration(milliseconds: 40),
     )..addListener(() {
         setState(() {});

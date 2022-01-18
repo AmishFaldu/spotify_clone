@@ -15,7 +15,9 @@ class Salutation extends StatelessWidget {
 
     return Text(
       greetingText,
-      style: Theme.of(context).textTheme.headline6,
+      style: Theme.of(context).textTheme.headline6!.copyWith(
+            fontSize: 25,
+          ),
     );
   }
 }
